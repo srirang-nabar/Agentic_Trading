@@ -1,0 +1,19 @@
+cells:
+- agent_type: zi_c
+  n_sessions: 50
+  name: zi_c
+- agent_type: zi_u
+  n_sessions: 50
+  name: zi_u
+design: smith
+experiment_id: zi_baseline
+market:
+  cash_endowment: 600
+  n_buyers: 4
+  n_periods: 6
+  n_sellers: 4
+  price_high: 200
+  price_low: 1
+  steps_per_period: 240
+  units_per_trader: 3
+seed: 20260714

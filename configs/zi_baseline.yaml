@@ -1,0 +1,21 @@
+# Stage 2 — Gode-Sunder replication: ZI-C vs ZI-U in the Smith-design CDA.
+# Design parameters are pre-registered in HYPOTHESES.md (incl. Amendment A1).
+experiment_id: zi_baseline
+design: smith
+seed: 20260714
+market:
+  n_buyers: 4
+  n_sellers: 4
+  units_per_trader: 3
+  price_low: 1
+  price_high: 200
+  cash_endowment: 600
+  n_periods: 6
+  steps_per_period: 240
+cells:
+  - name: zi_c
+    agent_type: zi_c
+    n_sessions: 50
+  - name: zi_u
+    agent_type: zi_u
+    n_sessions: 50

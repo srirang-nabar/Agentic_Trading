@@ -70,7 +70,8 @@ certifies Nash empirically (myopic best-response convergence) before any LLM ses
 | Sampling temperature | 0.7 (local and frontier; T=0 is prohibited — it collapses session independence) |
 | Retry policy | Max 3 retries on invalid order with error feedback, then forced pass |
 | Order-validity floor | ≥90% per local-model cell, ≥95% per frontier cell |
-| Smith CDA | 4 buyers + 4 sellers; 6 periods/session; ~30 polling rounds/period; seeded value/cost schedules with known competitive equilibrium; tick size 1; relabeled currency ("francs") |
+| Smith CDA | 4 buyers + 4 sellers; 6 periods/session; **240 polls/period** (30 polling rounds × 8 traders — see Amendment A1); 3 units per trader; prices in [1, 200]; buyer cash endowment 600 (= units × max price, so the engine cash constraint never binds and ZI-U is effectively unconstrained); seeded value/cost schedules with known competitive equilibrium (min equilibrium quantity 3, degenerate draws re-drawn); tick size 1; relabeled currency ("francs") |
+| ZI quote protocol | One standing quote per trader: polled with a resting order → cancel it; polled without → submit a fresh random quote; exhausted schedule → pass (LOB adaptation of Gode–Sunder's best-quote market) |
 | Early-period α (H1) | Mean Smith's α over periods 1–2 |
 | SSW market | 6 traders; 15 periods; dividend {0, 8, 28, 60} equiprobable (E=24); FV declines linearly 360 → 24; two endowment classes per the original design; relabeled units (deviation from human 9–12 subjects goes in the comparability table) |
 | Experience treatment | Full prior-session transcript rendered mechanically into context (no LLM-written summaries) |
@@ -106,4 +107,4 @@ recognition moderator, profit-framing moderator (duopoly).
 
 | Date | Change | Stage affected | Data collected yet? |
 | ---- | ------ | -------------- | ------------------- |
-|      |        |                |                     |
+| 2026-07-14 | **A1:** "~30 polling rounds/period" made concrete as 240 polls/period (30 rounds × 8 traders); units/trader fixed at 3; ZI cancel-then-replace quote protocol specified. Basis: a 160-session design-calibration pilot (seeds labeled "pilot", disjoint from experiment seeds, not part of any analysis) locating the ZI-C efficiency plateau: 0.68/0.86/0.92/0.94 at 60/120/240/360 polls. 240 chosen: on-plateau, matches the registered "~30 rounds" reading, and bounds Stage 4 LLM call counts. Note: ZI-C plateau ≈ 0.92–0.94 in this institution (persistent LOB, finite polling) vs. Gode–Sunder's ≈ 0.99 (best-quote market run to quote exhaustion) — the registered gate (mean ≥ 0.90, 95% CI excluding < 0.85) is unchanged. | Stage 2 (before any Stage 2 experiment session ran) | No |
