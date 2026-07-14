@@ -11,13 +11,10 @@ import hashlib
 from pathlib import Path
 
 
-def sha256_file(path: Path, chunk_size: int = 1 << 20) -> str:
-    """Return the SHA-256 hex digest of a file, streamed in chunks."""
-    digest = hashlib.sha256()
+def sha256_file(path: Path) -> str:
+    """Return the SHA-256 hex digest of a file (streamed)."""
     with path.open("rb") as f:
-        while chunk := f.read(chunk_size):
-            digest.update(chunk)
-    return digest.hexdigest()
+        return hashlib.file_digest(f, "sha256").hexdigest()
 
 
 def build_manifest(root: Path, patterns: tuple[str, ...] = ("**/*",)) -> dict[str, str]:
