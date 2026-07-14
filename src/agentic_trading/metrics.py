@@ -129,3 +129,84 @@ def session_metrics(log: dict[str, Any]) -> dict[str, Any]:
 def rank_biserial(u_statistic: float, n_x: int, n_y: int) -> float:
     """Rank-biserial effect size for a Mann-Whitney U (x vs y, 'greater')."""
     return 2.0 * u_statistic / (n_x * n_y) - 1.0
+
+
+def h1_summary(
+    zic_logs: list[dict[str, Any]],
+    llm_logs_by_paraphrase: dict[str, list[dict[str, Any]]],
+    *,
+    non_inferiority_margin: float = 0.05,
+    bootstrap_iterations: int = 10_000,
+    bootstrap_seed: int = 40426,
+) -> dict[str, Any]:
+    """Pre-registered H1 analysis (HYPOTHESES H1 + A2), computed from logs.
+
+    Primary: early-period Smith's alpha, LLM < ZI-C, one-sided Mann-Whitney
+    per paraphrase; the conjunction p (max over paraphrases) is what enters
+    Holm once H2/H3 exist. Secondary: efficiency non-inferiority via a seeded
+    bootstrap CI on the difference in means (lower bound must clear -margin).
+    """
+    import random as _random
+
+    from scipy import stats
+
+    def cell_stats(logs: list[dict[str, Any]]) -> dict[str, Any]:
+        alphas = [early_alpha_from_log(log) for log in logs]
+        finite = [a for a in alphas if math.isfinite(a)]
+        efficiencies = [session_metrics(log)["efficiency"] for log in logs]
+        return {
+            "alphas": alphas,
+            "mean_early_alpha": sum(finite) / len(finite) if finite else None,
+            "zero_early_trade_sessions": len(alphas) - len(finite),
+            "efficiencies": efficiencies,
+            "mean_efficiency": sum(efficiencies) / len(efficiencies),
+        }
+
+    def bootstrap_diff_lower(x: list[float], y: list[float]) -> float:
+        rng = _random.Random(bootstrap_seed)
+        diffs = sorted(
+            sum(rng.choices(x, k=len(x))) / len(x) - sum(rng.choices(y, k=len(y))) / len(y)
+            for _ in range(bootstrap_iterations)
+        )
+        return diffs[int(0.025 * bootstrap_iterations)]
+
+    zic = cell_stats(zic_logs)
+    result: dict[str, Any] = {"zi_c": zic, "paraphrases": {}}
+    for name, logs in llm_logs_by_paraphrase.items():
+        llm = cell_stats(logs)
+        u, p = stats.mannwhitneyu(llm["alphas"], zic["alphas"], alternative="less")
+        eff_lower = bootstrap_diff_lower(llm["efficiencies"], zic["efficiencies"])
+        llm.update(
+            {
+                "mannwhitney_u": float(u),
+                "p_alpha_less": float(p),
+                "efficiency_diff_lower95": eff_lower,
+                "efficiency_non_inferior": eff_lower > -non_inferiority_margin,
+            }
+        )
+        result["paraphrases"][name] = llm
+    ps = [c["p_alpha_less"] for c in result["paraphrases"].values()]
+    result["conjunction_p"] = max(ps) if ps else None
+    result["h1_direction_supported"] = all(
+        c["p_alpha_less"] < 0.05 for c in result["paraphrases"].values()
+    ) if ps else None
+    return result
+
+
+def early_alpha_from_log(log: dict[str, Any], last_period: int = 2) -> float:
+    """Pre-registered H1 endpoint (HYPOTHESES A2.i).
+
+    Smith's alpha over the pooled trade prices of periods 1..last_period.
+    A session with zero trades in that window returns +inf — no trades means
+    no convergence, and the rank-based primary test handles inf without
+    excluding the session (the no-discard rule stays intact).
+    """
+    traders = log["traders"]
+    eq = equilibrium(
+        [v for t in traders for v in t["values"]],
+        [c for t in traders for c in t["costs"]],
+    )
+    prices = [t["price"] for t in log["trades"] if t["period"] <= last_period]
+    if not prices:
+        return math.inf
+    return smith_alpha(prices, eq.price_mid)

@@ -1,0 +1,30 @@
+# Stage 5 — exploratory mixed market (descriptive only, never headline).
+# 3 paraphrase-A LLM traders + 3 ZI-C, one of each per endowment class
+# (trader indices interleave classes, so ids T1-T3 cover all three classes).
+experiment_id: ssw_explore
+design: ssw
+seed: 40426
+matched_schedules: true
+parallel_sessions: 8
+market:
+  n_periods: 15
+  dividend_values: [0, 8, 28, 60]
+  endowment_classes: [[225, 3], [585, 2], [945, 1]]
+  traders_per_class: 2
+  price_low: 1
+  price_high: 720
+  steps_per_period: 120   # keep equal to ssw_h2 (A4 pilot value)
+cells:
+  - name: ssw_mixed
+    agent_type: mixed
+    n_sessions: 15
+    mixed:
+      llm_trader_ids: [T1, T2, T3]   # one per endowment class
+    llm:
+      model: Qwen/Qwen2.5-7B-Instruct
+      revision: a09a35458c702b33eeacc393d103063234e8bc28
+      served_by: vllm-0.25.0
+      template: ssw_a
+      temperature: 0.7
+      max_tokens: 80
+      k_retries: 3

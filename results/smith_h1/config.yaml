@@ -1,0 +1,40 @@
+cells:
+- agent_type: zi_c
+  n_sessions: 30
+  name: zi_c
+- agent_type: llm
+  llm:
+    k_retries: 3
+    max_tokens: 80
+    model: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    served_by: vllm-0.25.0
+    temperature: 0.7
+    template: smith_a
+  n_sessions: 30
+  name: llm_local_a
+- agent_type: llm
+  llm:
+    k_retries: 3
+    max_tokens: 80
+    model: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    served_by: vllm-0.25.0
+    temperature: 0.7
+    template: smith_b
+  n_sessions: 30
+  name: llm_local_b
+design: smith
+experiment_id: smith_h1
+market:
+  cash_endowment: 600
+  n_buyers: 4
+  n_periods: 6
+  n_sellers: 4
+  price_high: 200
+  price_low: 1
+  steps_per_period: 240
+  units_per_trader: 3
+matched_schedules: true
+parallel_sessions: 8
+seed: 40426

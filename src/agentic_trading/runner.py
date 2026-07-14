@@ -71,6 +71,7 @@ class AgentView:
     remaining_values: tuple[int, ...]
     remaining_costs: tuple[int, ...]
     open_orders: tuple[tuple[int, str, int], ...]  # (order_id, side, price)
+    recent_trade_prices: tuple[int, ...] = ()  # last 10 this session, oldest first
 
 
 class Agent(Protocol):
@@ -130,6 +131,7 @@ def _view(exchange: Exchange, trader_id: str, step: int) -> AgentView:
         remaining_values=cfg.values[acct["n_bought"] + acct["n_open_bids"]:],
         remaining_costs=cfg.costs[acct["n_sold"] + acct["n_open_asks"]:],
         open_orders=open_orders,
+        recent_trade_prices=tuple(t["price"] for t in exchange.trades[-10:]),
     )
 
 
@@ -197,12 +199,21 @@ def run_experiment(
         yaml.safe_dump(config, f, sort_keys=True)
 
     summary: dict[str, Any] = {"experiment_id": experiment_id, "cells": {}}
+    # matched_schedules (HYPOTHESES A2.ii): market + polling seeds are shared
+    # across cells for a session index, so every cell trades session i in the
+    # identical market with the identical polling order.
+    seed_scope_shared = config.get("matched_schedules", False)
     for cell in config["cells"]:
         cell_name = cell["name"]
-        cell_sessions = []
-        lines = []
-        for index in range(cell["n_sessions"]):
-            market_rng = random.Random(derive_seed(base_seed, cell_name, index, "market"))
+        seed_scope = "shared" if seed_scope_shared else cell_name
+        is_llm = cell["agent_type"] == "llm"
+        # Pure-simulation cells stay sequential so their gzip output remains
+        # bit-reproducible; LLM cells are I/O-bound and parallelize safely
+        # (independent sessions, one client+recorder each).
+        parallel = int(config.get("parallel_sessions", 1)) if is_llm else 1
+
+        def run_one(index: int, cell=cell, cell_name=cell_name, seed_scope=seed_scope):
+            market_rng = random.Random(derive_seed(base_seed, seed_scope, index, "market"))
             traders, eq = generate_smith_market(market_rng, spec)
             if cell["agent_type"] in ("zi_c", "zi_u"):
                 agents = build_zi_agents(
@@ -221,7 +232,7 @@ def run_experiment(
                 agents,
                 n_periods=market_cfg["n_periods"],
                 steps_per_period=market_cfg["steps_per_period"],
-                poll_seed=derive_seed(base_seed, cell_name, index, "poll"),
+                poll_seed=derive_seed(base_seed, seed_scope, index, "poll"),
             )
             log["meta"] = {
                 "experiment_id": experiment_id,
@@ -231,21 +242,28 @@ def run_experiment(
             }
             if recorder is not None:
                 _attach_llm_capture(log, cell, agents, recorder)
-            lines.append(session_log_to_json(log))
             metrics = session_metrics(log)
             metrics["cell"] = cell_name
             metrics["session_index"] = index
             if recorder is not None:
                 metrics["validity"] = log["meta"]["validity"]
-            cell_sessions.append(metrics)
+            return session_log_to_json(log), metrics
 
-        _write_gzip_lines(out_dir / "sessions" / f"{cell_name}.jsonl.gz", lines)
+        cell_sessions = _execute_cell(
+            out_dir / "sessions" / f"{cell_name}.jsonl.gz",
+            run_one,
+            cell["n_sessions"],
+            parallel,
+        )
         efficiencies = [s["efficiency"] for s in cell_sessions]
         summary["cells"][cell_name] = {
             "n_sessions": len(cell_sessions),
             "mean_efficiency": sum(efficiencies) / len(efficiencies),
             "sessions": cell_sessions,
         }
+        print(f"[{experiment_id}] {cell_name}: n={len(cell_sessions)} "
+              f"mean_efficiency={summary['cells'][cell_name]['mean_efficiency']:.3f}",
+              flush=True)
 
     import json
 
@@ -258,13 +276,20 @@ def run_experiment(
 def _build_llm_agents(traders, llm_cfg: dict[str, Any], max_price: int):
     """One shared client + recorder per session; one LLMTrader per trader."""
     from agentic_trading.agents.llm import (
+        AnthropicChatClient,
         LLMTrader,
         LLMTraderConfig,
         OpenAICompatClient,
         SessionRecorder,
     )
 
-    client = OpenAICompatClient(llm_cfg["model"])
+    provider = llm_cfg.get("provider", "openai_compat")
+    if provider == "anthropic":
+        client = AnthropicChatClient(llm_cfg["model"])
+    elif provider == "openai_compat":
+        client = OpenAICompatClient(llm_cfg["model"])
+    else:
+        raise ValueError(f"unknown provider: {provider!r}")
     recorder = SessionRecorder()
     config = LLMTraderConfig(
         model=llm_cfg["model"],
@@ -273,6 +298,8 @@ def _build_llm_agents(traders, llm_cfg: dict[str, Any], max_price: int):
         max_tokens=llm_cfg.get("max_tokens", 80),
         max_price=max_price,
         k_retries=llm_cfg.get("k_retries", 3),
+        persona=llm_cfg.get("persona", "neutral"),
+        memory=llm_cfg.get("memory", "none"),
     )
     agents = {t.trader_id: LLMTrader(t.trader_id, client, recorder, config) for t in traders}
     return agents, recorder
@@ -293,8 +320,11 @@ def _attach_llm_capture(log, cell, agents, recorder) -> None:
     log["meta"]["llm"] = {
         "model": llm_cfg["model"],
         "revision": llm_cfg.get("revision"),
+        "provider": llm_cfg.get("provider", "openai_compat"),
         "template": llm_cfg["template"],
         "temperature": llm_cfg.get("temperature", 0.7),
+        "persona": llm_cfg.get("persona", "neutral"),
+        "memory": llm_cfg.get("memory", "none"),
     }
     log["meta"]["validity"] = recorder.validity_stats()
     log["meta"]["recognition_flags"] = scan_recognition(recorder.records)
@@ -420,13 +450,39 @@ def _projection_section(results_root: Path) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _write_gzip_lines(path: Path, lines: list[str]) -> None:
-    """Gzip with mtime pinned to 0: byte-identical on regeneration."""
+def _execute_cell(path: Path, run_one, n_sessions: int, parallel: int) -> list[dict]:
+    """Run a cell's sessions, writing each log line in session-index order.
+
+    Gzip mtime is pinned to 0 and sequential cells avoid mid-stream flushes,
+    so pure-simulation output stays byte-identical on regeneration. Parallel
+    (LLM) cells flush after every session for crash-safety — their bytes are
+    not reproducible anyway (live sampling).
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    metrics_by_index: list[dict | None] = [None] * n_sessions
     with open(path, "wb") as raw:
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gz:
             with io.TextIOWrapper(gz, encoding="utf-8") as text:
-                for line in lines:
-                    text.write(line + "\n")
+                if parallel <= 1:
+                    for index in range(n_sessions):
+                        line, metrics = run_one(index)
+                        text.write(line + "\n")
+                        metrics_by_index[index] = metrics
+                else:
+                    done: dict[int, tuple[str, dict]] = {}
+                    next_index = 0
+                    with ThreadPoolExecutor(max_workers=parallel) as pool:
+                        futures = {pool.submit(run_one, i): i for i in range(n_sessions)}
+                        for future in as_completed(futures):
+                            done[futures[future]] = future.result()
+                            while next_index in done:
+                                line, metrics = done.pop(next_index)
+                                text.write(line + "\n")
+                                text.flush()
+                                metrics_by_index[next_index] = metrics
+                                next_index += 1
+    return metrics_by_index
 
 
 if __name__ == "__main__":

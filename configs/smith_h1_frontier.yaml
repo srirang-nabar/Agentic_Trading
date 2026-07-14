@@ -1,0 +1,40 @@
+# Stage 4 — DEFERRED frontier cells (HYPOTHESES A2.vi; decision 2026-07-14).
+# Run later with: ANTHROPIC_API_KEY=... uv run python -m agentic_trading.runner \
+#     configs/smith_h1_frontier.yaml
+# Model tier decision pending (budget.md projection): claude-haiku-4-5 fits the
+# full two-paraphrase design (~$57); Sonnet-tier requires the pre-registered
+# fallback (paraphrase A only). Update `model:` below when decided; keep
+# temperature 0.7 (pre-registered) — restricted to models accepting it.
+# NOTE: expect multi-hour/day runtime at low API rate-limit tiers; set
+# parallel_sessions conservatively to respect RPM limits.
+experiment_id: smith_h1_frontier
+design: smith
+seed: 40426            # same base seed + matched_schedules => identical markets
+matched_schedules: true
+parallel_sessions: 2
+market:
+  n_buyers: 4
+  n_sellers: 4
+  units_per_trader: 3
+  price_low: 1
+  price_high: 200
+  cash_endowment: 600
+  n_periods: 6
+  steps_per_period: 240
+cells:
+  - name: llm_frontier_a
+    agent_type: llm
+    n_sessions: 30
+    llm: &llm_frontier
+      provider: anthropic
+      model: claude-haiku-4-5
+      template: smith_a
+      temperature: 0.7
+      max_tokens: 80
+      k_retries: 3
+  - name: llm_frontier_b
+    agent_type: llm
+    n_sessions: 30
+    llm:
+      <<: *llm_frontier
+      template: smith_b

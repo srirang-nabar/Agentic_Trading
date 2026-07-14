@@ -1,0 +1,38 @@
+# Stage 4 — Experiment 1 (H1): Smith convergence, local-8B vs ZI-C.
+# Design pre-registered in HYPOTHESES.md (incl. Amendments A1, A2).
+# Frontier cells deferred (A2.vi) — see smith_h1_frontier.yaml.
+experiment_id: smith_h1
+design: smith
+seed: 40426
+matched_schedules: true
+parallel_sessions: 8
+market:
+  n_buyers: 4
+  n_sellers: 4
+  units_per_trader: 3
+  price_low: 1
+  price_high: 200
+  cash_endowment: 600
+  n_periods: 6
+  steps_per_period: 240
+cells:
+  - name: zi_c
+    agent_type: zi_c
+    n_sessions: 30
+  - name: llm_local_a
+    agent_type: llm
+    n_sessions: 30
+    llm: &llm_local
+      model: Qwen/Qwen2.5-7B-Instruct
+      revision: a09a35458c702b33eeacc393d103063234e8bc28
+      served_by: vllm-0.25.0
+      template: smith_a
+      temperature: 0.7
+      max_tokens: 80
+      k_retries: 3
+  - name: llm_local_b
+    agent_type: llm
+    n_sessions: 30
+    llm:
+      <<: *llm_local
+      template: smith_b

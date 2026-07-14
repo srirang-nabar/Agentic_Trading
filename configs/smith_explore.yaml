@@ -1,0 +1,43 @@
+# Stage 4 — exploratory moderators (HYPOTHESES A2.v): persona and memory
+# window, paraphrase A, local model, 15 sessions each, DESCRIPTIVE ONLY.
+# Same base seed + matched_schedules => markets 0-14 identical to smith_h1.
+experiment_id: smith_explore
+design: smith
+seed: 40426
+matched_schedules: true
+parallel_sessions: 8
+market:
+  n_buyers: 4
+  n_sellers: 4
+  units_per_trader: 3
+  price_low: 1
+  price_high: 200
+  cash_endowment: 600
+  n_periods: 6
+  steps_per_period: 240
+cells:
+  - name: persona_risk_averse
+    agent_type: llm
+    n_sessions: 15
+    llm: &llm_local
+      model: Qwen/Qwen2.5-7B-Instruct
+      revision: a09a35458c702b33eeacc393d103063234e8bc28
+      served_by: vllm-0.25.0
+      template: smith_a
+      temperature: 0.7
+      max_tokens: 80
+      k_retries: 3
+      persona: risk_averse
+  - name: persona_aggressive
+    agent_type: llm
+    n_sessions: 15
+    llm:
+      <<: *llm_local
+      persona: aggressive
+  - name: memory_recent
+    agent_type: llm
+    n_sessions: 15
+    llm:
+      <<: *llm_local
+      persona: neutral
+      memory: recent

@@ -163,6 +163,42 @@ class OpenAICompatClient:
         )
 
 
+class AnthropicChatClient:
+    """Frontier transport via the official Anthropic SDK (Stage 4 frontier cell).
+
+    Restricted to models that accept an explicit temperature (Haiku 4.5,
+    Sonnet 4.6) — the pre-registered T=0.7 cannot be expressed on models that
+    reject sampling parameters (Opus 4.7+/Sonnet 5), which are also outside
+    the budget projection anyway. Reads ANTHROPIC_API_KEY from the
+    environment only.
+    """
+
+    def __init__(self, model: str):
+        import anthropic
+
+        self.model = model
+        self.call_count = 0
+        self._client = anthropic.Anthropic(timeout=120, max_retries=3)
+
+    def complete(self, messages, *, temperature, max_tokens) -> ChatResponse:
+        self.call_count += 1
+        system = "\n".join(m["content"] for m in messages if m["role"] == "system")
+        chat = [m for m in messages if m["role"] != "system"]
+        response = self._client.messages.create(
+            model=self.model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            system=system,
+            messages=chat,
+        )
+        text = "".join(b.text for b in response.content if b.type == "text")
+        return ChatResponse(
+            text=text,
+            prompt_tokens=response.usage.input_tokens,
+            completion_tokens=response.usage.output_tokens,
+        )
+
+
 class ScriptedClient:
     """Test transport: replays a fixed list of responses (then passes)."""
 
@@ -225,8 +261,8 @@ class PromptTemplate:
         return cls(name=name, text=data.decode(), sha256=hashlib.sha256(data).hexdigest())
 
 
-def render_role_block(view: AgentView) -> str:
-    lines = []
+def render_role_block(view: AgentView, persona: str = "neutral") -> str:
+    lines = [PERSONAS[persona]] if PERSONAS[persona] else []
     if view.remaining_values:
         lines.append(
             f"Your role: you can still buy {len(view.remaining_values)} unit(s) this "
@@ -245,7 +281,7 @@ def render_role_block(view: AgentView) -> str:
     return "\n".join(lines)
 
 
-def render_state(view: AgentView, feedback: str | None) -> str:
+def render_state(view: AgentView, feedback: str | None, memory: str = "none") -> str:
     best_bid = view.best_bid if view.best_bid is not None else "none"
     best_ask = view.best_ask if view.best_ask is not None else "none"
     last = view.last_trade_price if view.last_trade_price is not None else "none yet"
@@ -253,11 +289,18 @@ def render_state(view: AgentView, feedback: str | None) -> str:
         "; ".join(f"{side} at {price} (id {oid})" for oid, side, price in view.open_orders)
         or "none"
     )
+    memory_line = ""
+    if memory == "recent" and view.recent_trade_prices:
+        memory_line = (
+            "Recent trade prices, oldest first: "
+            + ", ".join(str(p) for p in view.recent_trade_prices) + ".\n"
+        )
     text = (
         f"Trading period {view.period}, turn {view.step + 1}.\n"
         f"Highest standing bid: {best_bid}. Lowest standing ask: {best_ask}.\n"
         f"Most recent trade price: {last}.\n"
-        f"Your resting offers: {open_orders}.\n"
+        + memory_line
+        + f"Your resting offers: {open_orders}.\n"
         f"Your reply (JSON only):"
     )
     if feedback:
@@ -268,6 +311,20 @@ def render_state(view: AgentView, feedback: str | None) -> str:
 # ---- the agent ----
 
 
+# Exploratory persona variants (HYPOTHESES A2.v) — appended to the role block.
+PERSONAS = {
+    "neutral": "",
+    "risk_averse": (
+        "You are a cautious trader: you strongly prefer safe, certain profits "
+        "and avoid any trade that could reduce your profit."
+    ),
+    "aggressive": (
+        "You are an aggressive trader: you push to trade as often as possible "
+        "and accept slim profit margins to get deals done."
+    ),
+}
+
+
 @dataclass
 class LLMTraderConfig:
     model: str
@@ -276,6 +333,14 @@ class LLMTraderConfig:
     max_tokens: int = 80
     max_price: int = 200
     k_retries: int = 3
+    persona: str = "neutral"
+    memory: str = "none"  # "none" (best quotes + last trade) | "recent" (adds price list)
+
+    def __post_init__(self) -> None:
+        if self.persona not in PERSONAS:
+            raise ValueError(f"unknown persona: {self.persona!r}")
+        if self.memory not in ("none", "recent"):
+            raise ValueError(f"unknown memory window: {self.memory!r}")
 
 
 class LLMTrader:
@@ -296,11 +361,12 @@ class LLMTrader:
         feedback: str | None = None
         for attempt in range(self.config.k_retries + 1):
             system = self.template.text.format(
-                role_block=render_role_block(view), max_price=self.config.max_price
+                role_block=render_role_block(view, self.config.persona),
+                max_price=self.config.max_price,
             )
             messages = [
                 {"role": "system", "content": system},
-                {"role": "user", "content": render_state(view, feedback)},
+                {"role": "user", "content": render_state(view, feedback, self.config.memory)},
             ]
             try:
                 response = self.client.complete(

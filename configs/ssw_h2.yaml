@@ -1,0 +1,45 @@
+# Stage 5 — Experiment 2 (H2): SSW bubbles, local-8B vs ZI-C anchor.
+# Design pre-registered in HYPOTHESES.md (H2 + Amendment A3).
+# steps_per_period is fixed by the pre-data ZI-C turnover pilot (A4) before
+# any session of this experiment runs.
+experiment_id: ssw_h2
+design: ssw
+seed: 40426
+matched_schedules: true
+parallel_sessions: 8
+market:
+  n_periods: 15
+  dividend_values: [0, 8, 28, 60]
+  endowment_classes: [[225, 3], [585, 2], [945, 1]]
+  traders_per_class: 2
+  price_low: 1
+  price_high: 720
+  steps_per_period: 120   # A4 pilot value — do not run before A4 is logged
+cells:
+  - name: ssw_zi_c
+    agent_type: zi_c
+    n_sessions: 30
+  - name: ssw_llm_a
+    agent_type: llm
+    n_sessions: 30
+    llm: &llm_local
+      model: Qwen/Qwen2.5-7B-Instruct
+      revision: a09a35458c702b33eeacc393d103063234e8bc28
+      served_by: vllm-0.25.0
+      template: ssw_a
+      temperature: 0.7
+      max_tokens: 80
+      k_retries: 3
+  - name: ssw_llm_b
+    agent_type: llm
+    n_sessions: 30
+    llm:
+      <<: *llm_local
+      template: ssw_b
+  - name: ssw_llm_a_exp
+    agent_type: llm
+    n_sessions: 30
+    experience_from: ssw_llm_a   # paired transcript, fresh dividend path (A3.iii-iv)
+    llm:
+      <<: *llm_local
+      template: ssw_a
