@@ -1,0 +1,164 @@
+{
+ "model": "Qwen/Qwen2.5-7B-Instruct",
+ "n_per_template": 10,
+ "templates": {
+  "smith_a": {
+   "recognition_rate": 1.0,
+   "responses": [
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"response\": \"This setup corresponds to the Double Auction Experiment, a well-known economic experiment designed to study market behavior and price formation. It was first introduced by economist John Harsanyi in his 1967 paper and later popularized by economists such as Vernon L. Smith, who conducted extensive experiments using this design to demonstrate the emergence of efficient markets through competitive bidding.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"answer\": \"This setup corresponds to the Double Auction Experiment, a well-known economics experiment. It was originally designed by economist John Kagel and his colleagues.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"response\": \"This setup corresponds to the Double Auction Experiment, which was first introduced by William Vickrey and later popularized by economists such as Douglas Gale and Alvin E. Roth.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"response\": \"This setup corresponds to the Double Auction Experiment, which was popularized by economists such as John Kagel and Dan Levin.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"answer\": \"This setup corresponds to the Double Auction Experiment, a well-known economics experiment designed by economist John Kagel and others.\"}"
+    },
+    {
+     "patterns": [
+      "vernon smith",
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"response\": \"This setup corresponds to the Double Auction Experiment, commonly studied by economists such as Vernon Smith.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"answer\": \"This setup corresponds to the Double Auction Experiment, a well-known economic experiment designed to study market behavior and price formation. It was first introduced by economist Martin Shubik in 1959.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"answer\": \"Yes, this setup corresponds to the Double Auction Experiment, commonly associated with Oliver Hart and Alvin E. Roth.\"}"
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"answer\": \"This setup corresponds to the Double Auction Experiment, a well-known economics experiment designed by economist Vernon L. Smith.\"}"
+    },
+    {
+     "patterns": [
+      "vernon smith",
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "{\"answer\": \"This setup corresponds to the Double Auction Experiment, commonly studied by economists such as William Poundstone and Vernon Smith.\"}"
+    }
+   ],
+   "template_sha256": "4fab082e53cd7653f9cdb839ff7281e385f9ea94ee46cee5071a63299ba3e87e"
+  },
+  "smith_b": {
+   "recognition_rate": 1.0,
+   "responses": [
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment. This experiment was first introduced by economist Martin Shubik in his 1971 paper titled \"The Design of Experimental Markets.\""
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment. This experiment was first introduced by Vernon L. Smith, who conducted pioneering work on market behavior and auction dynamics. The Double Auction Experiment has been widely used in academic literature to study various aspects of market behavior, such as price discovery, market efficiency, and the formation of expectations."
+    },
+    {
+     "patterns": [
+      "double auction",
+      "experimental economics"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment in experimental economics. This experiment was first introduced by economist Martin Shubik in 1959."
+    },
+    {
+     "patterns": [
+      "double auction",
+      "experimental economics"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economic experiment in experimental economics. This experiment was notably studied by economists such as Vernon L. Smith, who received the Nobel Memorial Prize in Economic Sciences for his work on market-based experiments."
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment. This experiment was notably studied by economists such as Vernon L. Smith, who conducted pioneering work on market behavior and auction dynamics."
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, which is a well-known economics experiment. This experiment was popularized by economists such as Vernon L. Smith, who conducted pioneering work on market behavior and auction dynamics."
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment. This experiment was first introduced by economists such as John Kagel and Dan Levin."
+    },
+    {
+     "patterns": [
+      "double auction"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment. This experiment was first conducted by economist Martin Shubik in 1959. It is often used to study market behavior, trading strategies, and the formation of prices in a controlled environment."
+    },
+    {
+     "patterns": [
+      "double auction",
+      "experimental economics"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economics experiment in experimental economics. This experiment was notably studied by economists such as Vernon L. Smith, who conducted pioneering work on market behavior and auction dynamics."
+    },
+    {
+     "patterns": [
+      "double auction",
+      "experimental economics"
+     ],
+     "recognized": true,
+     "response": "The setup described in this document corresponds to the Double Auction Experiment, a well-known economic experiment in game theory and experimental economics. This experiment was popularized by economists such as Vernon L. Smith, who conducted seminal work on market behavior and auction dynamics."
+    }
+   ],
+   "template_sha256": "5b1cc10bda580627c1940a17bd1a35d0d7c68edb9b6d05ee6a8f63a0ac8dc22c"
+  }
+ }
+}

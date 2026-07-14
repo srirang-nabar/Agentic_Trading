@@ -36,7 +36,14 @@ def generate_smith_market(
     rng: random.Random, spec: SmithMarketSpec
 ) -> tuple[list[TraderConfig], Equilibrium]:
     """Draw one market with a well-defined competitive equilibrium."""
-    while True:
+    max_supply = spec.n_sellers * spec.units_per_trader
+    max_demand = spec.n_buyers * spec.units_per_trader
+    if spec.min_equilibrium_quantity > min(max_supply, max_demand):
+        raise ValueError(
+            f"min_equilibrium_quantity={spec.min_equilibrium_quantity} is impossible: "
+            f"the market has at most {min(max_supply, max_demand)} tradeable units"
+        )
+    for _ in range(100_000):
         buyers = [
             TraderConfig(
                 trader_id=f"B{i + 1}",
@@ -69,3 +76,4 @@ def generate_smith_market(
         )
         if eq.quantity >= spec.min_equilibrium_quantity and eq.price_low <= eq.price_high:
             return buyers + sellers, eq
+    raise RuntimeError("could not draw a non-degenerate market in 100k attempts")

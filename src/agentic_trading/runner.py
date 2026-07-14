@@ -187,6 +187,7 @@ def run_experiment(
         price_low=market_cfg["price_low"],
         price_high=market_cfg["price_high"],
         cash_endowment=market_cfg["cash_endowment"],
+        min_equilibrium_quantity=market_cfg.get("min_equilibrium_quantity", 3),
     )
 
     results_root = Path(results_root)
@@ -203,12 +204,18 @@ def run_experiment(
         for index in range(cell["n_sessions"]):
             market_rng = random.Random(derive_seed(base_seed, cell_name, index, "market"))
             traders, eq = generate_smith_market(market_rng, spec)
-            agents = build_zi_agents(
-                traders,
-                kind=cell["agent_type"],
-                max_price=spec.price_high,
-                seed_for=lambda tid, i=index: derive_seed(base_seed, cell_name, i, "agent", tid),
-            )
+            if cell["agent_type"] in ("zi_c", "zi_u"):
+                agents = build_zi_agents(
+                    traders,
+                    kind=cell["agent_type"],
+                    max_price=spec.price_high,
+                    seed_for=lambda tid, i=index: derive_seed(base_seed, cell_name, i, "agent", tid),
+                )
+                recorder = None
+            elif cell["agent_type"] == "llm":
+                agents, recorder = _build_llm_agents(traders, cell["llm"], spec.price_high)
+            else:
+                raise ValueError(f"unknown agent_type: {cell['agent_type']!r}")
             log = run_session(
                 traders,
                 agents,
@@ -222,10 +229,14 @@ def run_experiment(
                 "agent_type": cell["agent_type"],
                 "session_index": index,
             }
+            if recorder is not None:
+                _attach_llm_capture(log, cell, agents, recorder)
             lines.append(session_log_to_json(log))
             metrics = session_metrics(log)
             metrics["cell"] = cell_name
             metrics["session_index"] = index
+            if recorder is not None:
+                metrics["validity"] = log["meta"]["validity"]
             cell_sessions.append(metrics)
 
         _write_gzip_lines(out_dir / "sessions" / f"{cell_name}.jsonl.gz", lines)
@@ -244,12 +255,169 @@ def run_experiment(
     return summary
 
 
+def _build_llm_agents(traders, llm_cfg: dict[str, Any], max_price: int):
+    """One shared client + recorder per session; one LLMTrader per trader."""
+    from agentic_trading.agents.llm import (
+        LLMTrader,
+        LLMTraderConfig,
+        OpenAICompatClient,
+        SessionRecorder,
+    )
+
+    client = OpenAICompatClient(llm_cfg["model"])
+    recorder = SessionRecorder()
+    config = LLMTraderConfig(
+        model=llm_cfg["model"],
+        template=llm_cfg["template"],
+        temperature=llm_cfg.get("temperature", 0.7),
+        max_tokens=llm_cfg.get("max_tokens", 80),
+        max_price=max_price,
+        k_retries=llm_cfg.get("k_retries", 3),
+    )
+    agents = {t.trader_id: LLMTrader(t.trader_id, client, recorder, config) for t in traders}
+    return agents, recorder
+
+
+def _attach_llm_capture(log, cell, agents, recorder) -> None:
+    """Full-capture attachment + the invalid-by-construction completeness check."""
+    from agentic_trading.agents.llm import scan_recognition
+
+    client = next(iter(agents.values())).client
+    if len(recorder.records) != client.call_count:
+        raise RuntimeError(
+            f"log completeness violated: {client.call_count} API calls but "
+            f"{len(recorder.records)} records — session is invalid by construction"
+        )
+    llm_cfg = cell["llm"]
+    log["llm_calls"] = recorder.records
+    log["meta"]["llm"] = {
+        "model": llm_cfg["model"],
+        "revision": llm_cfg.get("revision"),
+        "template": llm_cfg["template"],
+        "temperature": llm_cfg.get("temperature", 0.7),
+    }
+    log["meta"]["validity"] = recorder.validity_stats()
+    log["meta"]["recognition_flags"] = scan_recognition(recorder.records)
+
+
 def load_session_logs(path: Path | str) -> list[dict[str, Any]]:
     """Read one cell's gzip JSONL session logs back into dicts."""
     import json
 
     with gzip.open(path, "rt") as f:
         return [json.loads(line) for line in f if line.strip()]
+
+
+def write_budget(results_root: Path | str = "results") -> Path:
+    """Regenerate results/budget.md from every experiment's logs.
+
+    Token counts are summed from the llm_call records themselves, so the
+    cost-accounting gate test can recompute them independently and demand
+    an exact match. Local-model cost is GPU-time (billed hourly by the
+    rental provider), tracked as wall-clock LLM time per experiment.
+    """
+    results_root = Path(results_root)
+    rows = []
+    totals = {"prompt": 0, "completion": 0, "calls": 0}
+    for exp_dir in sorted(p for p in results_root.iterdir() if p.is_dir()):
+        sessions_dir = exp_dir / "sessions"
+        if not sessions_dir.is_dir():
+            continue
+        prompt = completion = calls = 0
+        wall_seconds = 0.0
+        for gz in sorted(sessions_dir.glob("*.jsonl.gz")):
+            for log in load_session_logs(gz):
+                records = log.get("llm_calls", [])
+                calls += len(records)
+                prompt += sum(r["prompt_tokens"] for r in records)
+                completion += sum(r["completion_tokens"] for r in records)
+                if records:
+                    wall_seconds += records[-1]["ts"] - records[0]["ts"]
+        if calls:
+            rows.append(
+                f"| {exp_dir.name} | {calls} | {prompt} | {completion} | "
+                f"{wall_seconds / 3600:.2f} |"
+            )
+            totals["prompt"] += prompt
+            totals["completion"] += completion
+            totals["calls"] += calls
+
+    text = (
+        "# Budget ledger (regenerated from logs by `runner.write_budget`)\n\n"
+        "Soft cap: **$150** for frontier-API spend (HYPOTHESES.md). Local-model\n"
+        "cells cost GPU rental time, not tokens — tracked as wall-clock hours of\n"
+        "LLM traffic; billable GPU hours are bounded below by this figure.\n\n"
+        "| Experiment | LLM calls | Prompt tokens | Completion tokens | LLM wall-clock (h) |\n"
+        "| --- | --- | --- | --- | --- |\n"
+        + "\n".join(rows)
+        + f"\n\n**Totals:** {totals['calls']} calls, {totals['prompt']} prompt + "
+        f"{totals['completion']} completion tokens.\n\n"
+        "Frontier-API dollar spend to date: **$0.00** (no frontier cells run yet).\n"
+        + _projection_section(results_root)
+    )
+    path = results_root / "budget.md"
+    path.write_text(text)
+    return path
+
+
+# Anthropic pricing per MTok as of 2026-07 (claude-api skill reference).
+# Prompts (~600 tok) sit below these models' prompt-caching minimums, so no
+# cache discount is assumed. Sequential in-session calls rule out the Batches
+# API discount. Update prices when re-projecting.
+_FRONTIER_PRICING = {
+    "claude-haiku-4-5": (1.00, 5.00),
+    "claude-sonnet-4-6": (3.00, 15.00),
+    "claude-opus-4-8": (5.00, 25.00),
+}
+
+
+def _projection_section(results_root: Path) -> str:
+    """Stage 3 gate: extrapolate frontier cost from measured smoke tokens."""
+    smoke = results_root / "llm_smoke" / "sessions" / "qwen_smoke.jsonl.gz"
+    if not smoke.is_file():
+        return ""
+    logs = load_session_logs(smoke)
+    records = [r for log in logs for r in log["llm_calls"]]
+    in_per_call = sum(r["prompt_tokens"] for r in records) / len(records)
+    out_per_call = sum(r["completion_tokens"] for r in records) / len(records)
+    polls = {
+        (i, r["trader_id"], r["period"], r["step"])
+        for i, log in enumerate(logs)
+        for r in log["llm_calls"]
+    }
+    retry_factor = len(records) / len(polls)
+
+    # Pre-registered frontier design: Stage 4 Smith (2 paraphrases x 30
+    # sessions x 1440 polls, 8 LLM traders) + Stage 6 duopoly (frontier pair
+    # 2x150x30x2 framings + mixed pair 1x150x30x2).
+    stage4_calls = 2 * 30 * 6 * 240 * retry_factor
+    stage6_calls = (2 + 1) * 150 * 30 * 2 * retry_factor
+    lines = [
+        "\n## Stage 4-6 frontier projection (Stage 3 gate)\n",
+        f"Measured on the smoke cell: {in_per_call:.0f} prompt + {out_per_call:.0f} "
+        f"completion tokens/call, retry factor {retry_factor:.2f}. Projected frontier "
+        f"calls: Stage 4 = {stage4_calls:,.0f}, Stage 6 = {stage6_calls:,.0f} "
+        "(Stage 5 frontier cells: none pre-declared; model scale is exploratory, local-only).\n",
+        "| Frontier model | Stage 4 | Stage 6 | Total | Fits $150 cap? |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for model, (price_in, price_out) in _FRONTIER_PRICING.items():
+        def dollars(calls: float) -> float:
+            return (
+                calls * in_per_call * price_in + calls * out_per_call * price_out
+            ) / 1e6
+
+        s4, s6 = dollars(stage4_calls), dollars(stage6_calls)
+        total = s4 + s6
+        verdict = "yes" if total <= 150 else "no — pre-registered fallback required"
+        lines.append(f"| {model} | ${s4:.0f} | ${s6:.0f} | **${total:.0f}** | {verdict} |")
+    lines.append(
+        "\nDecision recorded here per the gate: the frontier-tier model is chosen at "
+        "Stage 4 kickoff. If the chosen tier exceeds the cap, the pre-registered "
+        "fallback applies (paraphrase robustness on the local model; frontier runs "
+        "paraphrase A only; claims scoped accordingly)."
+    )
+    return "\n".join(lines) + "\n"
 
 
 def _write_gzip_lines(path: Path, lines: list[str]) -> None:

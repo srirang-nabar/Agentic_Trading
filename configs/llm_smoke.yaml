@@ -1,0 +1,28 @@
+# Stage 3 smoke test: 3-agent LLM mini-market, 10 consecutive sessions.
+# Gate: zero harness faults, order-validity >= 90% (HYPOTHESES.md / plan Stage 3).
+# Endpoint comes from env: TRADING_LLM_BASE_URL (+ TRADING_LLM_API_KEY).
+experiment_id: llm_smoke
+design: smith
+seed: 314159
+market:
+  n_buyers: 2
+  n_sellers: 1
+  units_per_trader: 2
+  price_low: 1
+  price_high: 200
+  cash_endowment: 400
+  n_periods: 2
+  steps_per_period: 30
+  min_equilibrium_quantity: 1
+cells:
+  - name: qwen_smoke
+    agent_type: llm
+    n_sessions: 10
+    llm:
+      model: Qwen/Qwen2.5-7B-Instruct
+      revision: a09a35458c702b33eeacc393d103063234e8bc28
+      served_by: vllm-0.25.0
+      template: smith_a
+      temperature: 0.7
+      max_tokens: 80
+      k_retries: 3

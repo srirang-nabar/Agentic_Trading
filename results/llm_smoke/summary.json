@@ -1,0 +1,391 @@
+{
+ "cells": {
+  "qwen_smoke": {
+   "mean_efficiency": -0.022675044861248345,
+   "n_sessions": 10,
+   "sessions": [
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.08196721311475409,
+     "equilibrium": {
+      "max_surplus": 61,
+      "price_high": 86,
+      "price_low": 54,
+      "price_mid": 70.0,
+      "quantity": 1
+     },
+     "n_trades": 3,
+     "periods": [
+      {
+       "alpha": 117.9112429944227,
+       "efficiency": -0.8360655737704918,
+       "n_trades": 2,
+       "period": 1,
+       "realized_surplus": -51,
+       "rmse": 82.53787009609589
+      },
+      {
+       "alpha": 121.42857142857143,
+       "efficiency": 1.0,
+       "n_trades": 1,
+       "period": 2,
+       "realized_surplus": 61,
+       "rmse": 85.0
+      }
+     ],
+     "session_index": 0,
+     "validity": {
+      "first_attempt_rate": 0.8166666666666667,
+      "forced_passes": 2,
+      "n_llm_calls": 79,
+      "n_llm_polls": 60,
+      "validity_rate": 0.9666666666666667
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.5,
+     "equilibrium": {
+      "max_surplus": 62,
+      "price_high": 89,
+      "price_low": 80,
+      "price_mid": 84.5,
+      "quantity": 1
+     },
+     "n_trades": 1,
+     "periods": [
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 1,
+       "realized_surplus": 0,
+       "rmse": null
+      },
+      {
+       "alpha": 40.828402366863905,
+       "efficiency": 1.0,
+       "n_trades": 1,
+       "period": 2,
+       "realized_surplus": 62,
+       "rmse": 34.5
+      }
+     ],
+     "session_index": 1,
+     "validity": {
+      "first_attempt_rate": 0.7333333333333333,
+      "forced_passes": 0,
+      "n_llm_calls": 76,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.36764705882352944,
+     "equilibrium": {
+      "max_surplus": 136,
+      "price_high": 156,
+      "price_low": 145,
+      "price_mid": 150.5,
+      "quantity": 2
+     },
+     "n_trades": 2,
+     "periods": [
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 1,
+       "realized_surplus": 0,
+       "rmse": null
+      },
+      {
+       "alpha": 15.009112289802683,
+       "efficiency": 0.7352941176470589,
+       "n_trades": 2,
+       "period": 2,
+       "realized_surplus": 100,
+       "rmse": 22.588713996153036
+      }
+     ],
+     "session_index": 2,
+     "validity": {
+      "first_attempt_rate": 0.85,
+      "forced_passes": 0,
+      "n_llm_calls": 73,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.5,
+     "equilibrium": {
+      "max_surplus": 136,
+      "price_high": 141,
+      "price_low": 121,
+      "price_mid": 131.0,
+      "quantity": 1
+     },
+     "n_trades": 1,
+     "periods": [
+      {
+       "alpha": 61.83206106870229,
+       "efficiency": 1.0,
+       "n_trades": 1,
+       "period": 1,
+       "realized_surplus": 136,
+       "rmse": 81.0
+      },
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 2,
+       "realized_surplus": 0,
+       "rmse": null
+      }
+     ],
+     "session_index": 3,
+     "validity": {
+      "first_attempt_rate": 0.9666666666666667,
+      "forced_passes": 0,
+      "n_llm_calls": 62,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.0,
+     "equilibrium": {
+      "max_surplus": 164,
+      "price_high": 136,
+      "price_low": 133,
+      "price_mid": 134.5,
+      "quantity": 2
+     },
+     "n_trades": 0,
+     "periods": [
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 1,
+       "realized_surplus": 0,
+       "rmse": null
+      },
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 2,
+       "realized_surplus": 0,
+       "rmse": null
+      }
+     ],
+     "session_index": 4,
+     "validity": {
+      "first_attempt_rate": 0.9833333333333333,
+      "forced_passes": 0,
+      "n_llm_calls": 61,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": -1.9727272727272727,
+     "equilibrium": {
+      "max_surplus": 55,
+      "price_high": 110,
+      "price_low": 94,
+      "price_mid": 102.0,
+      "quantity": 1
+     },
+     "n_trades": 3,
+     "periods": [
+      {
+       "alpha": 47.05882352941177,
+       "efficiency": -3.090909090909091,
+       "n_trades": 2,
+       "period": 1,
+       "realized_surplus": -170,
+       "rmse": 48.0
+      },
+      {
+       "alpha": 51.96078431372549,
+       "efficiency": -0.8545454545454545,
+       "n_trades": 1,
+       "period": 2,
+       "realized_surplus": -47,
+       "rmse": 53.0
+      }
+     ],
+     "session_index": 5,
+     "validity": {
+      "first_attempt_rate": 0.7833333333333333,
+      "forced_passes": 0,
+      "n_llm_calls": 73,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.6104651162790697,
+     "equilibrium": {
+      "max_surplus": 172,
+      "price_high": 181,
+      "price_low": 155,
+      "price_mid": 168.0,
+      "quantity": 1
+     },
+     "n_trades": 4,
+     "periods": [
+      {
+       "alpha": 13.396163613008214,
+       "efficiency": 0.6104651162790697,
+       "n_trades": 2,
+       "period": 1,
+       "realized_surplus": 105,
+       "rmse": 22.5055548698538
+      },
+      {
+       "alpha": 13.396163613008214,
+       "efficiency": 0.6104651162790697,
+       "n_trades": 2,
+       "period": 2,
+       "realized_surplus": 105,
+       "rmse": 22.5055548698538
+      }
+     ],
+     "session_index": 6,
+     "validity": {
+      "first_attempt_rate": 0.65,
+      "forced_passes": 2,
+      "n_llm_calls": 87,
+      "n_llm_polls": 60,
+      "validity_rate": 0.9666666666666667
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": -0.9166666666666666,
+     "equilibrium": {
+      "max_surplus": 60,
+      "price_high": 156,
+      "price_low": 106,
+      "price_mid": 131.0,
+      "quantity": 1
+     },
+     "n_trades": 4,
+     "periods": [
+      {
+       "alpha": 16.52279452054455,
+       "efficiency": -2.0,
+       "n_trades": 2,
+       "period": 1,
+       "realized_surplus": -120,
+       "rmse": 21.644860821913362
+      },
+      {
+       "alpha": 19.099230539231762,
+       "efficiency": 0.16666666666666666,
+       "n_trades": 2,
+       "period": 2,
+       "realized_surplus": 10,
+       "rmse": 25.019992006393608
+      }
+     ],
+     "session_index": 7,
+     "validity": {
+      "first_attempt_rate": 0.7666666666666667,
+      "forced_passes": 0,
+      "n_llm_calls": 82,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.5,
+     "equilibrium": {
+      "max_surplus": 121,
+      "price_high": 161,
+      "price_low": 103,
+      "price_mid": 132.0,
+      "quantity": 1
+     },
+     "n_trades": 1,
+     "periods": [
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 1,
+       "realized_surplus": 0,
+       "rmse": null
+      },
+      {
+       "alpha": 21.21212121212121,
+       "efficiency": 1.0,
+       "n_trades": 1,
+       "period": 2,
+       "realized_surplus": 121,
+       "rmse": 28.0
+      }
+     ],
+     "session_index": 8,
+     "validity": {
+      "first_attempt_rate": 0.9166666666666666,
+      "forced_passes": 0,
+      "n_llm_calls": 65,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "qwen_smoke",
+     "efficiency": 0.10256410256410256,
+     "equilibrium": {
+      "max_surplus": 117,
+      "price_high": 90,
+      "price_low": 89,
+      "price_mid": 89.5,
+      "quantity": 1
+     },
+     "n_trades": 1,
+     "periods": [
+      {
+       "alpha": 0.5586592178770949,
+       "efficiency": 0.20512820512820512,
+       "n_trades": 1,
+       "period": 1,
+       "realized_surplus": 24,
+       "rmse": 0.5
+      },
+      {
+       "alpha": null,
+       "efficiency": 0.0,
+       "n_trades": 0,
+       "period": 2,
+       "realized_surplus": 0,
+       "rmse": null
+      }
+     ],
+     "session_index": 9,
+     "validity": {
+      "first_attempt_rate": 0.8833333333333333,
+      "forced_passes": 0,
+      "n_llm_calls": 67,
+      "n_llm_polls": 60,
+      "validity_rate": 1.0
+     }
+    }
+   ]
+  }
+ },
+ "experiment_id": "llm_smoke"
+}

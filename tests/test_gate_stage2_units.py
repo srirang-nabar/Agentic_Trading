@@ -204,6 +204,15 @@ def hash_free(*parts):
 
 
 class TestSmithMarketGenerator:
+    def test_impossible_quantity_floor_raises_instead_of_hanging(self):
+        # Regression (Stage 3): a floor above the market's tradeable units
+        # made generate_smith_market loop forever.
+        spec = SmithMarketSpec(
+            n_buyers=2, n_sellers=1, units_per_trader=2, min_equilibrium_quantity=3
+        )
+        with pytest.raises(ValueError, match="impossible"):
+            generate_smith_market(random.Random(1), spec)
+
     def test_deterministic_given_seed(self):
         a = generate_smith_market(random.Random(42), SmithMarketSpec())
         b = generate_smith_market(random.Random(42), SmithMarketSpec())

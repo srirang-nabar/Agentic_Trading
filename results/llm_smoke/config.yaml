@@ -1,0 +1,25 @@
+cells:
+- agent_type: llm
+  llm:
+    k_retries: 3
+    max_tokens: 80
+    model: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    served_by: vllm-0.25.0
+    temperature: 0.7
+    template: smith_a
+  n_sessions: 10
+  name: qwen_smoke
+design: smith
+experiment_id: llm_smoke
+market:
+  cash_endowment: 400
+  min_equilibrium_quantity: 1
+  n_buyers: 2
+  n_periods: 2
+  n_sellers: 1
+  price_high: 200
+  price_low: 1
+  steps_per_period: 30
+  units_per_trader: 2
+seed: 314159
