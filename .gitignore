@@ -1,1 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+
+# tooling caches
+.pytest_cache/
+.hypothesis/
+.ipynb_checkpoints/
+.mypy_cache/
+.ruff_cache/
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# private planning notes
 plan.md
