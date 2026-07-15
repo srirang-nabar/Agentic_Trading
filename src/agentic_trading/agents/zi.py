@@ -74,3 +74,47 @@ def build_zi_agents(
         )
         for t in traders
     }
+
+
+class SSWZITrader:
+    """ZI-C adapted to the SSW carry-over market (HYPOTHESES A3.v).
+
+    SSW induces no value/cost schedules, so "constrained" means budget- and
+    holding-feasible only: when quoteless, flip a seeded fair coin between
+    bid and ask; bid ~ U[1, min(available cash, max_price)]; ask ~ U[1,
+    max_price] and requires a held certificate; an infeasible drawn side
+    falls back to the other; both infeasible -> pass. Cancel-then-replace as
+    in the Smith protocol. By construction the agent embeds no view of the
+    dividend value — it is the unstructured-mispricing anchor.
+    """
+
+    def __init__(self, trader_id: str, seed: int, *, max_price: int):
+        self.trader_id = trader_id
+        self.rng = random.Random(seed)
+        self.max_price = max_price
+
+    def act(self, view: AgentView) -> Action:
+        if view.open_orders:
+            return CancelAction(order_id=view.open_orders[0][0])
+        can_bid = view.cash_available >= 1
+        can_ask = view.inventory_available >= 1
+        want_bid = self.rng.random() < 0.5
+        if want_bid and not can_bid:
+            want_bid = False
+        elif not want_bid and not can_ask:
+            want_bid = True
+        if want_bid and can_bid:
+            high = min(view.cash_available, self.max_price)
+            return SubmitAction(side=Side.BUY, price=self.rng.randint(1, high))
+        if not want_bid and can_ask:
+            return SubmitAction(side=Side.SELL, price=self.rng.randint(1, self.max_price))
+        return None  # neither side feasible
+
+
+def build_ssw_zi_agents(
+    trader_ids: list[str], *, max_price: int, seed_for: "callable"
+) -> dict[str, SSWZITrader]:
+    return {
+        tid: SSWZITrader(tid, seed_for(tid), max_price=max_price)
+        for tid in trader_ids
+    }

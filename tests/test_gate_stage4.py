@@ -125,6 +125,9 @@ def test_h1_analysis_matches_claims(cells):
             "yes" if a["efficiency_non_inferior"] and b["efficiency_non_inferior"]
             else "no"
         ),
+        "H1-6": f"{a['mean_efficiency']:.2f}",
+        "H1-7": f"{b['mean_efficiency']:.2f}",
+        "H1-8": f"{summary['zi_c']['mean_efficiency']:.2f}",
     }
     for claim_id, value in computed.items():
         assert claims.get(claim_id) == value, (

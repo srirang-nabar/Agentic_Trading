@@ -6,9 +6,15 @@ LLM traffic; billable GPU hours are bounded below by this figure.
 
 | Experiment | LLM calls | Prompt tokens | Completion tokens | LLM wall-clock (h) |
 | --- | --- | --- | --- | --- |
+| duopoly_explore | 6750 | 2760078 | 51490 | 0.64 |
+| duopoly_h3 | 18000 | 7003268 | 140908 | 1.73 |
 | llm_smoke | 725 | 257211 | 9401 | 0.08 |
+| smith_explore | 97543 | 37763626 | 1276146 | 15.20 |
+| smith_h1 | 106043 | 37776003 | 1343878 | 16.41 |
+| ssw_explore | 11024 | 5244691 | 154435 | 1.55 |
+| ssw_h2 | 82570 | 49144400 | 1023227 | 11.30 |
 
-**Totals:** 725 calls, 257211 prompt + 9401 completion tokens.
+**Totals:** 322655 calls, 139949277 prompt + 3999485 completion tokens.
 
 Frontier-API dollar spend to date: **$0.00** (no frontier cells run yet).
 

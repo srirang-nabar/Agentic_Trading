@@ -50,12 +50,18 @@ class Side(str, Enum):
 
 @dataclass(frozen=True)
 class TraderConfig:
-    """Per-period endowment and induced-value schedules for one trader."""
+    """Per-period endowment and induced-value schedules for one trader.
+
+    In carry-over institutions (SSW, Stage 5) there are no induced-value
+    schedules: `endowed_units` grants the trader's certificates once, at the
+    first period open, and holdings persist across periods.
+    """
 
     trader_id: str
     cash: int = 0
     values: tuple[int, ...] = ()  # redemption value of k-th unit bought
     costs: tuple[int, ...] = ()  # cost of k-th unit sold; endows len(costs) units
+    endowed_units: int = 0  # carry-over institutions only (SSW)
 
 
 # --- Events: the replay format. The ordered event list is the session's ---
@@ -90,7 +96,16 @@ class Pass:
     trader_id: str
 
 
-Event = Union[PeriodOpen, PeriodClose, Submit, Cancel, Pass]
+@dataclass(frozen=True)
+class Dividend:
+    """One common per-unit payout to every holder (SSW; applied while the
+    market is closed, after the period's close). Part of the event log, so
+    replay reproduces payouts without any RNG."""
+
+    amount: int
+
+
+Event = Union[PeriodOpen, PeriodClose, Submit, Cancel, Pass, Dividend]
 
 Outcome = dict[str, Any]
 
@@ -146,13 +161,21 @@ def max_total_surplus(traders: Sequence[TraderConfig]) -> int:
 class Exchange:
     """Deterministic CDA over one asset for a fixed roster of traders."""
 
-    def __init__(self, traders: Sequence[TraderConfig]):
+    def __init__(self, traders: Sequence[TraderConfig], *, carry_over: bool = False):
         ids = [t.trader_id for t in traders]
         if len(ids) != len(set(ids)):
             raise ValueError("duplicate trader_id")
         for t in traders:
             if t.cash < 0 or any(v < 0 for v in t.values) or any(c < 0 for c in t.costs):
                 raise ValueError(f"negative endowment for {t.trader_id}")
+            if t.endowed_units < 0:
+                raise ValueError(f"negative endowment for {t.trader_id}")
+            if carry_over and (t.values or t.costs):
+                raise ValueError(
+                    f"{t.trader_id}: induced-value schedules are a per-period "
+                    "institution; carry-over traders use endowed_units"
+                )
+        self._carry_over = carry_over
         self._configs: dict[str, TraderConfig] = {t.trader_id: t for t in traders}
         self._accounts: dict[str, _Account] = {
             t.trader_id: _Account(config=t) for t in traders
@@ -180,6 +203,8 @@ class Exchange:
             outcome = self._apply_cancel(event)
         elif isinstance(event, Pass):
             outcome = self._apply_pass(event)
+        elif isinstance(event, Dividend):
+            outcome = self._apply_dividend(event)
         else:
             outcome = _rejected("unknown_event")
         self.events.append(event)
@@ -253,33 +278,51 @@ class Exchange:
         return sum(a.period_surplus for a in self._accounts.values())
 
     def session_log(self) -> dict[str, Any]:
-        """The primary scientific artifact: complete inputs and outputs."""
-        return {
-            "traders": [
-                {
-                    "trader_id": t.trader_id,
-                    "cash": t.cash,
-                    "values": list(t.values),
-                    "costs": list(t.costs),
-                }
-                for t in (self._configs[tid] for tid in sorted(self._configs))
-            ],
+        """The primary scientific artifact: complete inputs and outputs.
+
+        Carry-over keys are emitted only in carry-over mode so that
+        per-period (Smith/ZI) logs remain byte-identical to those written
+        before Stage 5 existed — regeneration gates compare raw bytes.
+        """
+        traders = []
+        for t in (self._configs[tid] for tid in sorted(self._configs)):
+            entry = {
+                "trader_id": t.trader_id,
+                "cash": t.cash,
+                "values": list(t.values),
+                "costs": list(t.costs),
+            }
+            if self._carry_over:
+                entry["endowed_units"] = t.endowed_units
+            traders.append(entry)
+        log = {
+            "traders": traders,
             "events": [event_to_dict(e) for e in self.events],
             "outcomes": self.outcomes,
             "trades": self.trades,
             "final": self.state_snapshot(),
         }
+        if self._carry_over:
+            log["carry_over"] = True
+        return log
 
     # ---- event handlers ----
 
     def _apply_period_open(self) -> Outcome:
         if self._market_open:
             return _rejected("period_already_open")
+        first_period = self._period == 0
         self._period += 1
         for acct in self._accounts.values():
-            acct.cash = acct.config.cash
+            if not self._carry_over:
+                # per-period institution (Smith): re-endow every period
+                acct.cash = acct.config.cash
+                acct.inventory = len(acct.config.costs)
+            elif first_period:
+                # carry-over institution (SSW): endow once, then persist
+                acct.cash = acct.config.cash
+                acct.inventory = acct.config.endowed_units
             acct.committed_cash = 0
-            acct.inventory = len(acct.config.costs)
             acct.n_open_bids = 0
             acct.n_open_asks = 0
             acct.n_bought = 0
@@ -317,7 +360,9 @@ class Exchange:
             return _rejected("invalid_side")
 
         if side is Side.BUY:
-            if acct.n_bought + acct.n_open_bids >= len(acct.config.values):
+            if not self._carry_over and (
+                acct.n_bought + acct.n_open_bids >= len(acct.config.values)
+            ):
                 return _rejected("schedule_exhausted")
             available_cash = acct.cash - acct.committed_cash
             best = self.best_ask()
@@ -349,11 +394,12 @@ class Exchange:
             return {"status": "resting", "order_id": order_id}
 
         # SELL
-        if acct.n_sold + acct.n_open_asks >= len(acct.config.costs):
+        if not self._carry_over and (
+            acct.n_sold + acct.n_open_asks >= len(acct.config.costs)
+        ):
             return _rejected("schedule_exhausted")
-        # Defensive only: with inventory endowed as len(costs) and asks capped
-        # by the cost schedule above, this cannot fire — kept as insurance
-        # should endowment semantics change (e.g. SSW carry-over in Stage 5).
+        # Binding in carry-over mode (every ask is backed by a held unit);
+        # defensive in per-period mode, where the schedule cap already holds.
         if acct.inventory - acct.n_open_asks < 1:
             return _rejected("insufficient_inventory")
         best = self.best_bid()
@@ -401,6 +447,30 @@ class Exchange:
             return _rejected("unknown_trader")
         return {"status": "passed"}
 
+    def _apply_dividend(self, ev: Dividend) -> Outcome:
+        """Pay `amount` per held unit to every trader (carry-over mode only,
+        market closed — SSW pays at period close, before the next open)."""
+        if not self._carry_over:
+            return _rejected("no_dividends_in_per_period_institution")
+        if self._market_open:
+            return _rejected("market_open")
+        if self._period == 0:
+            return _rejected("no_period_closed_yet")
+        if type(ev.amount) is not int or ev.amount < 0:
+            return _rejected("invalid_dividend")
+        paid = {}
+        for tid in sorted(self._accounts):
+            acct = self._accounts[tid]
+            payout = ev.amount * acct.inventory
+            acct.cash += payout
+            paid[tid] = payout
+        return {
+            "status": "dividend",
+            "period": self._period,
+            "amount": ev.amount,
+            "paid": paid,
+        }
+
     # ---- internals ----
 
     def _take_order_id(self) -> int:
@@ -430,8 +500,13 @@ class Exchange:
             seller.n_open_asks -= 1
         del self._book[resting.order_id]
 
-        buyer_value = buyer.config.values[buyer.n_bought]
-        seller_cost = seller.config.costs[seller.n_sold]
+        if self._carry_over:
+            # No induced schedules: a resale market's trading gains net to
+            # zero at the moment of trade (wealth changes come via dividends).
+            buyer_value = seller_cost = price
+        else:
+            buyer_value = buyer.config.values[buyer.n_bought]
+            seller_cost = seller.config.costs[seller.n_sold]
 
         buyer.cash -= price
         buyer.inventory += 1
@@ -483,6 +558,8 @@ def event_to_dict(event: Event) -> dict[str, Any]:
         return {"type": "cancel", "trader_id": event.trader_id, "order_id": event.order_id}
     if isinstance(event, Pass):
         return {"type": "pass", "trader_id": event.trader_id}
+    if isinstance(event, Dividend):
+        return {"type": "dividend", "amount": event.amount}
     raise TypeError(f"not an event: {event!r}")
 
 
@@ -498,4 +575,6 @@ def event_from_dict(d: dict[str, Any]) -> Event:
         return Cancel(trader_id=d["trader_id"], order_id=d["order_id"])
     if kind == "pass":
         return Pass(trader_id=d["trader_id"])
+    if kind == "dividend":
+        return Dividend(amount=d["amount"])
     raise ValueError(f"unknown event type: {kind!r}")

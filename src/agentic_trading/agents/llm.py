@@ -83,21 +83,26 @@ def parse_decision(text: str) -> tuple[OrderDecision | None, str | None]:
 def validate_decision(
     decision: OrderDecision, view: AgentView, *, max_price: int
 ) -> str | None:
-    """Semantic check against the trader's own state; None means valid."""
+    """Semantic check against the trader's own state; None means valid.
+
+    view.n_periods marks a carry-over (SSW) view: there are no induced-value
+    schedules there, so only cash/holding feasibility applies.
+    """
+    per_period = view.n_periods is None
     if decision.action == "bid":
-        if not view.remaining_values:
+        if per_period and not view.remaining_values:
             return "you cannot buy any more units this period"
         if not (1 <= decision.price <= max_price):
             return f"price must be a whole number between 1 and {max_price}"
         if decision.price > view.cash_available:
             return f"you only have {view.cash_available} francs available"
     elif decision.action == "ask":
-        if not view.remaining_costs:
+        if per_period and not view.remaining_costs:
             return "you cannot sell any more units this period"
         if not (1 <= decision.price <= max_price):
             return f"price must be a whole number between 1 and {max_price}"
         if view.inventory_available < 1:
-            return "you have no unit available to sell"
+            return "you have no certificate available to sell" if not per_period else "you have no unit available to sell"
     elif decision.action == "cancel":
         if not view.open_orders:
             return "you have no resting offer to cancel"
@@ -263,6 +268,12 @@ class PromptTemplate:
 
 def render_role_block(view: AgentView, persona: str = "neutral") -> str:
     lines = [PERSONAS[persona]] if PERSONAS[persona] else []
+    if view.n_periods is not None:  # carry-over (SSW): live holdings, no schedules
+        lines.append(
+            f"You currently have {view.cash_available} francs available to spend "
+            f"and hold {view.inventory_available} certificate(s) available to sell."
+        )
+        return "\n".join(lines)
     if view.remaining_values:
         lines.append(
             f"Your role: you can still buy {len(view.remaining_values)} unit(s) this "
@@ -295,9 +306,17 @@ def render_state(view: AgentView, feedback: str | None, memory: str = "none") ->
             "Recent trade prices, oldest first: "
             + ", ".join(str(p) for p in view.recent_trade_prices) + ".\n"
         )
+    if view.n_periods is not None:
+        remaining = view.n_periods - view.period
+        period_line = (
+            f"Trading period {view.period} of {view.n_periods} — this period's "
+            f"payout plus {remaining} more remain.\n"
+        )
+    else:
+        period_line = f"Trading period {view.period}, turn {view.step + 1}.\n"
     text = (
-        f"Trading period {view.period}, turn {view.step + 1}.\n"
-        f"Highest standing bid: {best_bid}. Lowest standing ask: {best_ask}.\n"
+        period_line
+        + f"Highest standing bid: {best_bid}. Lowest standing ask: {best_ask}.\n"
         f"Most recent trade price: {last}.\n"
         + memory_line
         + f"Your resting offers: {open_orders}.\n"
@@ -335,6 +354,9 @@ class LLMTraderConfig:
     k_retries: int = 3
     persona: str = "neutral"
     memory: str = "none"  # "none" (best quotes + last trade) | "recent" (adds price list)
+    # extra static template placeholders (SSW: n_periods/payouts/mean_payout);
+    # unused placeholders are harmless, missing ones raise at render time
+    template_vars: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.persona not in PERSONAS:
@@ -350,19 +372,28 @@ class LLMTrader:
         client: ChatClient,
         recorder: SessionRecorder,
         config: LLMTraderConfig,
+        *,
+        experience: str | None = None,
     ):
         self.trader_id = trader_id
         self.client = client
         self.recorder = recorder
         self.config = config
         self.template = PromptTemplate.load(config.template)
+        # experience treatment (HYPOTHESES A3.iv): a mechanically templated
+        # transcript of this trader's paired prior session, or None
+        self.experience = experience
 
     def act(self, view: AgentView) -> Action:
         feedback: str | None = None
         for attempt in range(self.config.k_retries + 1):
+            role_block = render_role_block(view, self.config.persona)
+            if self.experience:
+                role_block = f"{role_block}\n\n{self.experience}"
             system = self.template.text.format(
-                role_block=render_role_block(view, self.config.persona),
+                role_block=role_block,
                 max_price=self.config.max_price,
+                **self.config.template_vars,
             )
             messages = [
                 {"role": "system", "content": system},
@@ -412,6 +443,144 @@ class LLMTrader:
         )
 
 
+# ---- duopoly market maker (Stage 6) ----
+
+
+class SpreadDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    margin: int
+
+
+def parse_spread_decision(
+    text: str, *, max_half_spread: int
+) -> tuple[int | None, str | None]:
+    """Total parser for the duopoly margin schema."""
+    candidate = text.strip()
+    fence = _FENCE_RE.search(candidate)
+    if fence:
+        candidate = fence.group(1).strip()
+    try:
+        obj = json.loads(candidate)
+    except (json.JSONDecodeError, RecursionError):
+        return None, "reply was not a single valid JSON object"
+    if not isinstance(obj, dict):
+        return None, "reply must be a JSON object, not a list or scalar"
+    try:
+        decision = SpreadDecision.model_validate(obj)
+    except ValidationError as exc:
+        first = exc.errors()[0]
+        return None, f"invalid reply: {first['loc']}: {first['msg']}"
+    if not 1 <= decision.margin <= max_half_spread:
+        return None, f"margin must be a whole number between 1 and {max_half_spread}"
+    return decision.margin, None
+
+
+class LLMMarketMaker:
+    """One quote-setting dealer (HYPOTHESES A5-A6).
+
+    Same guarantees as LLMTrader: full capture, total parsing, bounded
+    retries. The registered fallback when retries are exhausted (A6): repeat
+    the dealer's previous margin; in round 1, quote the widest margin (no
+    flow is captured, competitively neutral).
+    """
+
+    def __init__(
+        self,
+        mm_id: str,
+        client: ChatClient,
+        recorder: SessionRecorder,
+        config: LLMTraderConfig,
+        *,
+        max_half_spread: int,
+    ):
+        self.mm_id = mm_id
+        self.client = client
+        self.recorder = recorder
+        self.config = config
+        self.max_half_spread = max_half_spread
+        self.template = PromptTemplate.load(config.template)
+        self.last_margin: int | None = None
+
+    def quote(self, context: dict[str, Any]) -> int:
+        """context: round, n_rounds, own_last, rival_last, executions, round_profit, total_profit."""
+        system = self.template.text.format(
+            role_block=PERSONAS[self.config.persona] or "You are one of the two dealers.",
+            **self.config.template_vars,
+        )
+        feedback: str | None = None
+        for attempt in range(self.config.k_retries + 1):
+            messages = [
+                {"role": "system", "content": system},
+                {"role": "user", "content": _render_mm_state(context, feedback)},
+            ]
+            try:
+                response = self.client.complete(
+                    messages,
+                    temperature=self.config.temperature,
+                    max_tokens=self.config.max_tokens,
+                )
+            except Exception as exc:
+                self._record(context, attempt, messages, None, f"transport error: {exc}")
+                return self._fallback()
+            margin, error = parse_spread_decision(
+                response.text, max_half_spread=self.max_half_spread
+            )
+            self._record(context, attempt, messages, response, error, margin)
+            if error is None:
+                self.last_margin = margin
+                return margin
+            feedback = error
+        return self._fallback()
+
+    def _fallback(self) -> int:
+        return self.last_margin if self.last_margin is not None else self.max_half_spread
+
+    def _record(self, context, attempt, messages, response, error, margin=None) -> None:
+        self.recorder.record(
+            {
+                "kind": "llm_call",
+                "trader_id": self.mm_id,
+                "period": context["round"],
+                "step": 0,
+                "attempt": attempt,
+                "model": self.config.model,
+                "temperature": self.config.temperature,
+                "max_tokens": self.config.max_tokens,
+                "template": self.template.name,
+                "template_sha256": self.template.sha256,
+                "messages": messages,
+                "raw_response": response.text if response else None,
+                "prompt_tokens": response.prompt_tokens if response else 0,
+                "completion_tokens": response.completion_tokens if response else 0,
+                "parsed": {"margin": margin} if error is None and margin is not None else None,
+                "error": error,
+                "ts": time.time(),
+            }
+        )
+
+
+def _render_mm_state(context: dict[str, Any], feedback: str | None) -> str:
+    round_no, n_rounds = context["round"], context["n_rounds"]
+    if context["own_last"] is None:
+        history = "This is the first round; there is no history yet."
+    else:
+        history = (
+            f"Last round your margin was {context['own_last']} and the other "
+            f"dealer's margin was {context['rival_last']}. You won "
+            f"{context['executions']} customer trade(s) and made "
+            f"{context['round_profit']} francs (total so far: "
+            f"{context['total_profit']} francs)."
+        )
+    text = (
+        f"Round {round_no} of {n_rounds}.\n{history}\n"
+        "Your reply (JSON only):"
+    )
+    if feedback:
+        text = f"Your previous reply was invalid: {feedback}. Try again.\n\n" + text
+    return text
+
+
 # ---- contamination scan (in-session recognition, per protocol item c) ----
 
 RECOGNITION_PATTERNS = (
@@ -423,10 +592,29 @@ RECOGNITION_PATTERNS = (
 
 def scan_recognition(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Flag raw responses that verbalize recognition of the experimental design."""
+    return _scan(records, RECOGNITION_PATTERNS)
+
+
+# Duopoly guardrail (HYPOTHESES A5.vii): agents never see each other's
+# reasoning, but transcripts are still scanned for explicit coordination
+# language and the flags reported.
+COORDINATION_PATTERNS = (
+    "collude", "collusion", "cartel", "let's both", "we should both",
+    "agree to", "cooperate with the other", "signal to the other",
+    "keep our margins high", "avoid undercutting each other",
+)
+
+
+def scan_coordination(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flag raw responses containing explicit coordination language."""
+    return _scan(records, COORDINATION_PATTERNS)
+
+
+def _scan(records: list[dict[str, Any]], patterns: tuple[str, ...]) -> list[dict[str, Any]]:
     flags = []
     for r in records:
         text = (r.get("raw_response") or "").lower()
-        hits = [p for p in RECOGNITION_PATTERNS if p in text]
+        hits = [p for p in patterns if p in text]
         if hits:
             flags.append(
                 {"trader_id": r["trader_id"], "period": r["period"], "step": r["step"],

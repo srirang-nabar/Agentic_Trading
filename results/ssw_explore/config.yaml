@@ -1,0 +1,40 @@
+cells:
+- agent_type: mixed
+  llm:
+    k_retries: 3
+    max_tokens: 80
+    model: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    served_by: vllm-0.25.0
+    temperature: 0.7
+    template: ssw_a
+  mixed:
+    llm_trader_ids:
+    - T1
+    - T2
+    - T3
+  n_sessions: 15
+  name: ssw_mixed
+design: ssw
+experiment_id: ssw_explore
+market:
+  dividend_values:
+  - 0
+  - 8
+  - 28
+  - 60
+  endowment_classes:
+  - - 225
+    - 3
+  - - 585
+    - 2
+  - - 945
+    - 1
+  n_periods: 15
+  price_high: 720
+  price_low: 1
+  steps_per_period: 60
+  traders_per_class: 2
+matched_schedules: true
+parallel_sessions: 8
+seed: 40426

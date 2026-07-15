@@ -23,10 +23,14 @@ def build_manifest(root: Path, patterns: tuple[str, ...] = ("**/*",)) -> dict[st
     Returns {relative_posix_path: hex_digest}, sorted by path so the
     manifest is deterministic.
     """
+    # Self-referential artifacts stay out of the manifest: the manifest
+    # itself, and the fresh-machine transcript, which is mid-write while
+    # the dry run's own Tier 2 verifies the manifest.
+    excluded = {"MANIFEST.sha256", "fresh_machine_run.log"}
     entries: dict[str, str] = {}
     for pattern in patterns:
         for path in sorted(root.glob(pattern)):
-            if path.is_file() and path.name != "MANIFEST.sha256":
+            if path.is_file() and path.name not in excluded:
                 entries[path.relative_to(root).as_posix()] = sha256_file(path)
     return dict(sorted(entries.items()))
 

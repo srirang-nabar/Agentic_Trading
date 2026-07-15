@@ -1,0 +1,296 @@
+{
+ "cells": {
+  "ssw_mixed": {
+   "mean_rd": 0.940284397464767,
+   "n_sessions": 15,
+   "sessions": [
+    {
+     "amplitude": 1.6833333333333331,
+     "cell": "ssw_mixed",
+     "duration": 3,
+     "n_traded_periods": 15,
+     "rad": 1.254795524691358,
+     "rd": 1.1223881172839507,
+     "session_index": 0,
+     "shape_ok": false,
+     "turnover": 6.833333333333333,
+     "validity": {
+      "first_attempt_rate": 0.8849557522123894,
+      "forced_passes": 32,
+      "n_llm_calls": 571,
+      "n_llm_polls": 452,
+      "validity_rate": 0.9292035398230089
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.4341666666666666,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 12,
+     "rad": 1.0948531539351851,
+     "rd": 0.9452871817129629,
+     "session_index": 1,
+     "shape_ok": true,
+     "turnover": 4.583333333333333,
+     "validity": {
+      "first_attempt_rate": 0.7794759825327511,
+      "forced_passes": 73,
+      "n_llm_calls": 712,
+      "n_llm_polls": 458,
+      "validity_rate": 0.8406113537117904
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.375,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 15,
+     "rad": 1.2705150462962964,
+     "rd": 1.1916956018518519,
+     "session_index": 2,
+     "shape_ok": false,
+     "turnover": 6.0,
+     "validity": {
+      "first_attempt_rate": 0.7203389830508474,
+      "forced_passes": 110,
+      "n_llm_calls": 827,
+      "n_llm_polls": 472,
+      "validity_rate": 0.7669491525423728
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 0.9256944444444444,
+     "cell": "ssw_mixed",
+     "duration": 5,
+     "n_traded_periods": 15,
+     "rad": 1.1581963734567902,
+     "rd": 1.1581963734567902,
+     "session_index": 3,
+     "shape_ok": false,
+     "turnover": 6.666666666666667,
+     "validity": {
+      "first_attempt_rate": 0.6371308016877637,
+      "forced_passes": 114,
+      "n_llm_calls": 897,
+      "n_llm_polls": 474,
+      "validity_rate": 0.759493670886076
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.1013888888888888,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 14,
+     "rad": 0.6514322916666667,
+     "rd": 0.6484561011904761,
+     "session_index": 4,
+     "shape_ok": true,
+     "turnover": 4.833333333333333,
+     "validity": {
+      "first_attempt_rate": 0.7310195227765727,
+      "forced_passes": 88,
+      "n_llm_calls": 774,
+      "n_llm_polls": 461,
+      "validity_rate": 0.8091106290672451
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.3035714285714284,
+     "cell": "ssw_mixed",
+     "duration": 5,
+     "n_traded_periods": 15,
+     "rad": 0.8240633267195768,
+     "rd": 0.7307919973544973,
+     "session_index": 5,
+     "shape_ok": false,
+     "turnover": 6.666666666666667,
+     "validity": {
+      "first_attempt_rate": 0.903755868544601,
+      "forced_passes": 14,
+      "n_llm_calls": 500,
+      "n_llm_polls": 426,
+      "validity_rate": 0.9671361502347418
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.5984567901234568,
+     "cell": "ssw_mixed",
+     "duration": 5,
+     "n_traded_periods": 15,
+     "rad": 1.2311009149029981,
+     "rd": 1.112563106261023,
+     "session_index": 6,
+     "shape_ok": true,
+     "turnover": 6.833333333333333,
+     "validity": {
+      "first_attempt_rate": 0.7889908256880734,
+      "forced_passes": 55,
+      "n_llm_calls": 644,
+      "n_llm_polls": 436,
+      "validity_rate": 0.8738532110091743
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.5944444444444446,
+     "cell": "ssw_mixed",
+     "duration": 3,
+     "n_traded_periods": 15,
+     "rad": 0.8739703207671957,
+     "rd": 0.7616488921957673,
+     "session_index": 7,
+     "shape_ok": false,
+     "turnover": 4.833333333333333,
+     "validity": {
+      "first_attempt_rate": 0.7004504504504504,
+      "forced_passes": 98,
+      "n_llm_calls": 779,
+      "n_llm_polls": 444,
+      "validity_rate": 0.7792792792792793
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.7055555555555555,
+     "cell": "ssw_mixed",
+     "duration": 3,
+     "n_traded_periods": 15,
+     "rad": 0.905329861111111,
+     "rd": 0.7573360339506173,
+     "session_index": 8,
+     "shape_ok": false,
+     "turnover": 5.5,
+     "validity": {
+      "first_attempt_rate": 0.8485523385300668,
+      "forced_passes": 48,
+      "n_llm_calls": 615,
+      "n_llm_polls": 449,
+      "validity_rate": 0.8930957683741648
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.4037037037037037,
+     "cell": "ssw_mixed",
+     "duration": 3,
+     "n_traded_periods": 15,
+     "rad": 0.9258549658289241,
+     "rd": 0.8851142250881834,
+     "session_index": 9,
+     "shape_ok": true,
+     "turnover": 6.333333333333333,
+     "validity": {
+      "first_attempt_rate": 0.6579520697167756,
+      "forced_passes": 125,
+      "n_llm_calls": 877,
+      "n_llm_polls": 459,
+      "validity_rate": 0.7276688453159041
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.512797619047619,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 15,
+     "rad": 0.8081514550264549,
+     "rd": 0.5361028439153439,
+     "session_index": 10,
+     "shape_ok": false,
+     "turnover": 5.083333333333333,
+     "validity": {
+      "first_attempt_rate": 0.7735849056603774,
+      "forced_passes": 71,
+      "n_llm_calls": 666,
+      "n_llm_polls": 424,
+      "validity_rate": 0.8325471698113207
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.8236111111111113,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 14,
+     "rad": 1.451152830924036,
+     "rd": 1.365959378543084,
+     "session_index": 11,
+     "shape_ok": false,
+     "turnover": 4.75,
+     "validity": {
+      "first_attempt_rate": 0.6651884700665188,
+      "forced_passes": 122,
+      "n_llm_calls": 855,
+      "n_llm_polls": 451,
+      "validity_rate": 0.729490022172949
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.8833333333333333,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 14,
+     "rad": 1.3267118659696784,
+     "rd": 1.1006453977157102,
+     "session_index": 12,
+     "shape_ok": false,
+     "turnover": 6.583333333333333,
+     "validity": {
+      "first_attempt_rate": 0.7194570135746606,
+      "forced_passes": 93,
+      "n_llm_calls": 762,
+      "n_llm_polls": 442,
+      "validity_rate": 0.7895927601809954
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.4081349206349207,
+     "cell": "ssw_mixed",
+     "duration": 4,
+     "n_traded_periods": 14,
+     "rad": 1.160437039399093,
+     "rd": 1.1444931618480727,
+     "session_index": 13,
+     "shape_ok": false,
+     "turnover": 6.416666666666667,
+     "validity": {
+      "first_attempt_rate": 0.7551020408163265,
+      "forced_passes": 65,
+      "n_llm_calls": 689,
+      "n_llm_polls": 441,
+      "validity_rate": 0.8526077097505669
+     },
+     "zero_trade_session": false
+    },
+    {
+     "amplitude": 1.4157407407407407,
+     "cell": "ssw_mixed",
+     "duration": 3,
+     "n_traded_periods": 15,
+     "rad": 0.767256531084656,
+     "rd": 0.6435875496031745,
+     "session_index": 14,
+     "shape_ok": false,
+     "turnover": 6.0,
+     "validity": {
+      "first_attempt_rate": 0.6227272727272727,
+      "forced_passes": 120,
+      "n_llm_calls": 856,
+      "n_llm_polls": 440,
+      "validity_rate": 0.7272727272727273
+     },
+     "zero_trade_session": false
+    }
+   ]
+  }
+ },
+ "experiment_id": "ssw_explore"
+}

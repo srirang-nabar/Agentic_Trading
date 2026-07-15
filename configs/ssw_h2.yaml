@@ -14,7 +14,7 @@ market:
   traders_per_class: 2
   price_low: 1
   price_high: 720
-  steps_per_period: 120   # A4 pilot value — do not run before A4 is logged
+  steps_per_period: 60    # fixed by the A4 ZI-C pilot (HYPOTHESES A4)
 cells:
   - name: ssw_zi_c
     agent_type: zi_c

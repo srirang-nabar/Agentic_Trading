@@ -1,0 +1,41 @@
+cells:
+- agent_type: llm
+  llm:
+    k_retries: 3
+    max_tokens: 80
+    model: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    served_by: vllm-0.25.0
+    temperature: 0.7
+    template: duopoly_a_profit
+  n_sessions: 15
+  name: duo_profit_a
+- agent_type: mixed
+  llm:
+    k_retries: 3
+    max_tokens: 80
+    model: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    served_by: vllm-0.25.0
+    temperature: 0.7
+    template: duopoly_a
+  mixed:
+    llm_trader_ids:
+    - MM0
+  n_sessions: 15
+  name: duo_mixed
+design: duopoly
+experiment_id: duopoly_explore
+market:
+  arrival_rate: 5.0
+  inventory_phi: 2.0
+  max_half_spread: 20
+  n_rounds: 150
+  probe_rounds:
+  - 80
+  - 100
+  - 120
+  reference_value: 100
+matched_schedules: true
+parallel_sessions: 8
+seed: 40426

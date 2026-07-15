@@ -54,3 +54,41 @@ def verify_claims(
                 f"but CLAIMS.md says {row['value']!r}"
             )
     return f"OK: {len(rows)} claim(s) verified against CLAIMS.md"
+
+
+def tier2(results_root: Path | str = "results") -> int:
+    """Tier 2 (Stage 7): recompute every statistic from raw logs, no API key.
+
+    1. Verify the results manifest (log integrity).
+    2. Run the full pytest suite — every gate recomputes its statistics from
+       the committed JSONL logs and reconciles them against CLAIMS.md.
+    Returns the process exit code (0 = everything verified).
+    """
+    import subprocess
+    import sys
+
+    from agentic_trading.manifest import verify_manifest
+
+    mismatches = verify_manifest(Path(results_root))
+    if mismatches:
+        print("MANIFEST MISMATCH:", mismatches)
+        return 1
+    print("manifest OK — running the full statistical suite from logs...")
+    proc = subprocess.run([sys.executable, "-m", "pytest", "-q"])
+    return proc.returncode
+
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(description="Volunteer reproduction entry point")
+    parser.add_argument("--tier", type=int, choices=(1, 2), default=2)
+    args = parser.parse_args()
+    if args.tier == 1:
+        print(
+            "Tier 1: execute the numbered notebooks in notebooks/ top-to-bottom —\n"
+            "each replays committed logs and asserts its claims against CLAIMS.md."
+        )
+        sys.exit(0)
+    sys.exit(tier2())

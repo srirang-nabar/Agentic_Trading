@@ -74,3 +74,48 @@ def generate_ssw_market(spec: SSWMarketSpec, rng: random.Random) -> SSWMarket:
     )
     dividends = tuple(rng.choice(spec.dividend_values) for _ in range(spec.n_periods))
     return SSWMarket(spec=spec, traders=traders, dividends=dividends)
+
+
+def render_experience(log: dict, trader_id: str) -> str:
+    """Mechanically templated transcript of a prior session (A3.iv).
+
+    Deterministic template — never an LLM-written summary. Contents fixed by
+    the amendment: per period the trade count, median trade price, and
+    realized payout; plus this trader's own final cash, holdings, and profit.
+    """
+    import statistics
+    from collections import defaultdict
+
+    by_period: dict[int, list[int]] = defaultdict(list)
+    for trade in log["trades"]:
+        by_period[trade["period"]].append(trade["price"])
+    dividends = log["ssw"]["dividends"]
+
+    lines = [
+        "For your information, you already traded one full session under these "
+        "same rules. Here is its complete record:"
+    ]
+    for period in range(1, log["final"]["period"] + 1):
+        prices = by_period.get(period)
+        payout = dividends[period - 1]
+        if prices:
+            lines.append(
+                f"- Period {period}: {len(prices)} trade(s), median price "
+                f"{statistics.median(prices):g} francs; payout {payout} francs "
+                "per certificate."
+            )
+        else:
+            lines.append(
+                f"- Period {period}: no trades; payout {payout} francs per certificate."
+            )
+    initial = next(t["cash"] for t in log["traders"] if t["trader_id"] == trader_id)
+    account = next(
+        a for a in log["final"]["accounts"] if a["trader_id"] == trader_id
+    )
+    profit = account["cash"] - initial
+    lines.append(
+        f"You finished that session with {account['cash']} francs "
+        f"({'a profit of ' + str(profit) if profit >= 0 else 'a loss of ' + str(-profit)} "
+        f"francs) and {account['inventory']} certificate(s), which expired worthless."
+    )
+    return "\n".join(lines)

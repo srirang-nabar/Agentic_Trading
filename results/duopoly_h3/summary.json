@@ -1,0 +1,2057 @@
+{
+ "cells": {
+  "duo_llm_a": {
+   "mean_markup": 27.420512820512823,
+   "n_sessions": 30,
+   "sessions": [
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.358974358974358,
+     "mean_half_spread": 18.17948717948718,
+     "mean_probe_response": -4.233333333333333,
+     "probes": [
+      {
+       "post_mean": 9.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -9.1
+      },
+      {
+       "post_mean": 9.6,
+       "pre_mean": 11.9,
+       "probe_round": 100,
+       "response": -2.3000000000000007
+      },
+      {
+       "post_mean": 8.4,
+       "pre_mean": 9.7,
+       "probe_round": 120,
+       "response": -1.299999999999999
+      }
+     ],
+     "session_index": 0,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.102564102564102,
+     "mean_half_spread": 18.05128205128205,
+     "mean_probe_response": -0.36666666666666714,
+     "probes": [
+      {
+       "post_mean": 18.4,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": 0.09999999999999787
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 17.7,
+       "probe_round": 100,
+       "response": -0.3000000000000007
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 17.9,
+       "probe_round": 120,
+       "response": -0.8999999999999986
+      }
+     ],
+     "session_index": 1,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 27.692307692307693,
+     "mean_half_spread": 17.846153846153847,
+     "mean_probe_response": -0.43333333333333596,
+     "probes": [
+      {
+       "post_mean": 18.4,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": 0.09999999999999787
+      },
+      {
+       "post_mean": 16.4,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -1.7000000000000028
+      },
+      {
+       "post_mean": 18.4,
+       "pre_mean": 18.1,
+       "probe_round": 120,
+       "response": 0.29999999999999716
+      }
+     ],
+     "session_index": 2,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.205128205128204,
+     "mean_half_spread": 18.102564102564102,
+     "mean_probe_response": -2.5,
+     "probes": [
+      {
+       "post_mean": 14.2,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": -4.100000000000001
+      },
+      {
+       "post_mean": 10.8,
+       "pre_mean": 14.1,
+       "probe_round": 100,
+       "response": -3.299999999999999
+      },
+      {
+       "post_mean": 9.6,
+       "pre_mean": 9.7,
+       "probe_round": 120,
+       "response": -0.09999999999999964
+      }
+     ],
+     "session_index": 3,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.205128205128204,
+     "mean_half_spread": 18.102564102564102,
+     "mean_probe_response": -1.1666666666666667,
+     "probes": [
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -0.5
+      },
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -1.6999999999999993
+      },
+      {
+       "post_mean": 16.2,
+       "pre_mean": 17.5,
+       "probe_round": 120,
+       "response": -1.3000000000000007
+      }
+     ],
+     "session_index": 4,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.51282051282051,
+     "mean_half_spread": 18.256410256410255,
+     "mean_probe_response": -1.2333333333333343,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 18.5,
+       "probe_round": 100,
+       "response": -1.5
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -1.1000000000000014
+      }
+     ],
+     "session_index": 5,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.256410256410255,
+     "mean_half_spread": 18.128205128205128,
+     "mean_probe_response": -1.1000000000000014,
+     "probes": [
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.8999999999999986
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -0.7000000000000028
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.1,
+       "probe_round": 120,
+       "response": -0.7000000000000028
+      }
+     ],
+     "session_index": 6,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.102564102564102,
+     "mean_half_spread": 18.05128205128205,
+     "mean_probe_response": -1.6333333333333335,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 17.9,
+       "probe_round": 100,
+       "response": -0.5
+      },
+      {
+       "post_mean": 14.6,
+       "pre_mean": 17.9,
+       "probe_round": 120,
+       "response": -3.299999999999999
+      }
+     ],
+     "session_index": 7,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.153846153846153,
+     "mean_half_spread": 18.076923076923077,
+     "mean_probe_response": -1.3000000000000007,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 15.4,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -2.9000000000000004
+      },
+      {
+       "post_mean": 14.6,
+       "pre_mean": 14.5,
+       "probe_round": 120,
+       "response": 0.09999999999999964
+      }
+     ],
+     "session_index": 8,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.205128205128204,
+     "mean_half_spread": 18.102564102564102,
+     "mean_probe_response": -0.9666666666666673,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": -0.9000000000000021
+      },
+      {
+       "post_mean": 16.2,
+       "pre_mean": 17.9,
+       "probe_round": 100,
+       "response": -1.6999999999999993
+      },
+      {
+       "post_mean": 17.8,
+       "pre_mean": 18.1,
+       "probe_round": 120,
+       "response": -0.3000000000000007
+      }
+     ],
+     "session_index": 9,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 21.23076923076923,
+     "mean_half_spread": 14.615384615384615,
+     "mean_probe_response": -1.9666666666666661,
+     "probes": [
+      {
+       "post_mean": 12.8,
+       "pre_mean": 14.1,
+       "probe_round": 80,
+       "response": -1.299999999999999
+      },
+      {
+       "post_mean": 9.6,
+       "pre_mean": 14.5,
+       "probe_round": 100,
+       "response": -4.9
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 10.1,
+       "probe_round": 120,
+       "response": 0.3000000000000007
+      }
+     ],
+     "session_index": 10,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.256410256410255,
+     "mean_half_spread": 18.128205128205128,
+     "mean_probe_response": -1.3,
+     "probes": [
+      {
+       "post_mean": 17.0,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.5
+      },
+      {
+       "post_mean": 15.8,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -2.3000000000000007
+      },
+      {
+       "post_mean": 14.6,
+       "pre_mean": 14.7,
+       "probe_round": 120,
+       "response": -0.09999999999999964
+      }
+     ],
+     "session_index": 11,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 27.897435897435898,
+     "mean_half_spread": 17.94871794871795,
+     "mean_probe_response": -0.9666666666666686,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.1,
+       "probe_round": 80,
+       "response": -0.7000000000000028
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -0.7000000000000028
+      },
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.1,
+       "probe_round": 120,
+       "response": -1.5
+      }
+     ],
+     "session_index": 12,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.102564102564102,
+     "mean_half_spread": 18.05128205128205,
+     "mean_probe_response": -1.3,
+     "probes": [
+      {
+       "post_mean": 17.0,
+       "pre_mean": 17.9,
+       "probe_round": 80,
+       "response": -0.8999999999999986
+      },
+      {
+       "post_mean": 15.4,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -2.9000000000000004
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 17.1,
+       "probe_round": 120,
+       "response": -0.10000000000000142
+      }
+     ],
+     "session_index": 13,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.307692307692307,
+     "mean_half_spread": 18.153846153846153,
+     "mean_probe_response": 0.29999999999999954,
+     "probes": [
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.1,
+       "probe_round": 80,
+       "response": -0.10000000000000142
+      },
+      {
+       "post_mean": 18.4,
+       "pre_mean": 17.9,
+       "probe_round": 100,
+       "response": 0.5
+      },
+      {
+       "post_mean": 18.4,
+       "pre_mean": 17.9,
+       "probe_round": 120,
+       "response": 0.5
+      }
+     ],
+     "session_index": 14,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 26.97435897435897,
+     "mean_half_spread": 17.487179487179485,
+     "mean_probe_response": -1.8333333333333333,
+     "probes": [
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": -1.6999999999999993
+      },
+      {
+       "post_mean": 16.2,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -1.9000000000000021
+      },
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -1.8999999999999986
+      }
+     ],
+     "session_index": 15,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.307692307692307,
+     "mean_half_spread": 18.153846153846153,
+     "mean_probe_response": -0.43333333333333357,
+     "probes": [
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -0.5
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 17.7,
+       "probe_round": 100,
+       "response": -0.6999999999999993
+      },
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.1,
+       "probe_round": 120,
+       "response": -0.10000000000000142
+      }
+     ],
+     "session_index": 16,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 21.846153846153847,
+     "mean_half_spread": 14.923076923076923,
+     "mean_probe_response": 0.16666666666666666,
+     "probes": [
+      {
+       "post_mean": 18.0,
+       "pre_mean": 16.3,
+       "probe_round": 80,
+       "response": 1.6999999999999993
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 17.7,
+       "probe_round": 100,
+       "response": -0.6999999999999993
+      },
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -0.5
+      }
+     ],
+     "session_index": 17,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 27.07692307692308,
+     "mean_half_spread": 17.53846153846154,
+     "mean_probe_response": -2.5666666666666664,
+     "probes": [
+      {
+       "post_mean": 16.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -2.1000000000000014
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 14.7,
+       "probe_round": 100,
+       "response": -4.299999999999999
+      },
+      {
+       "post_mean": 8.4,
+       "pre_mean": 9.7,
+       "probe_round": 120,
+       "response": -1.299999999999999
+      }
+     ],
+     "session_index": 18,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.205128205128204,
+     "mean_half_spread": 18.102564102564102,
+     "mean_probe_response": -2.9000000000000004,
+     "probes": [
+      {
+       "post_mean": 16.2,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -2.3000000000000007
+      },
+      {
+       "post_mean": 9.2,
+       "pre_mean": 14.3,
+       "probe_round": 100,
+       "response": -5.100000000000001
+      },
+      {
+       "post_mean": 8.4,
+       "pre_mean": 9.7,
+       "probe_round": 120,
+       "response": -1.299999999999999
+      }
+     ],
+     "session_index": 19,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.358974358974358,
+     "mean_half_spread": 18.17948717948718,
+     "mean_probe_response": -1.1000000000000014,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -1.1000000000000014
+      }
+     ],
+     "session_index": 20,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 27.94871794871795,
+     "mean_half_spread": 17.974358974358974,
+     "mean_probe_response": -1.8333333333333321,
+     "probes": [
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.8999999999999986
+      },
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -1.6999999999999993
+      },
+      {
+       "post_mean": 16.6,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -1.8999999999999986
+      }
+     ],
+     "session_index": 21,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.41025641025641,
+     "mean_half_spread": 18.205128205128204,
+     "mean_probe_response": -2.233333333333334,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 15.4,
+       "pre_mean": 18.5,
+       "probe_round": 100,
+       "response": -3.0999999999999996
+      },
+      {
+       "post_mean": 11.6,
+       "pre_mean": 14.1,
+       "probe_round": 120,
+       "response": -2.5
+      }
+     ],
+     "session_index": 22,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.205128205128204,
+     "mean_half_spread": 18.102564102564102,
+     "mean_probe_response": -3.9,
+     "probes": [
+      {
+       "post_mean": 14.6,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -3.9000000000000004
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 14.7,
+       "probe_round": 100,
+       "response": -4.299999999999999
+      },
+      {
+       "post_mean": 6.2,
+       "pre_mean": 9.7,
+       "probe_round": 120,
+       "response": -3.499999999999999
+      }
+     ],
+     "session_index": 23,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.102564102564102,
+     "mean_half_spread": 18.05128205128205,
+     "mean_probe_response": -0.7000000000000016,
+     "probes": [
+      {
+       "post_mean": 18.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -0.10000000000000142
+      },
+      {
+       "post_mean": 18.4,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": 0.29999999999999716
+      },
+      {
+       "post_mean": 16.2,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -2.3000000000000007
+      }
+     ],
+     "session_index": 24,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.153846153846153,
+     "mean_half_spread": 18.076923076923077,
+     "mean_probe_response": -2.700000000000001,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -1.1000000000000014
+      },
+      {
+       "post_mean": 15.4,
+       "pre_mean": 18.1,
+       "probe_round": 100,
+       "response": -2.700000000000001
+      },
+      {
+       "post_mean": 10.0,
+       "pre_mean": 14.3,
+       "probe_round": 120,
+       "response": -4.300000000000001
+      }
+     ],
+     "session_index": 25,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 22.615384615384617,
+     "mean_half_spread": 15.307692307692308,
+     "mean_probe_response": -0.7000000000000005,
+     "probes": [
+      {
+       "post_mean": 17.0,
+       "pre_mean": 17.5,
+       "probe_round": 80,
+       "response": -0.5
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 17.9,
+       "probe_round": 100,
+       "response": -0.5
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -1.1000000000000014
+      }
+     ],
+     "session_index": 26,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 27.794871794871796,
+     "mean_half_spread": 17.897435897435898,
+     "mean_probe_response": -0.2333333333333331,
+     "probes": [
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -0.5
+      },
+      {
+       "post_mean": 18.0,
+       "pre_mean": 17.7,
+       "probe_round": 100,
+       "response": 0.3000000000000007
+      },
+      {
+       "post_mean": 18.0,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -0.5
+      }
+     ],
+     "session_index": 27,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 28.307692307692307,
+     "mean_half_spread": 18.153846153846153,
+     "mean_probe_response": -1.1000000000000014,
+     "probes": [
+      {
+       "post_mean": 17.0,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": -1.3000000000000007
+      },
+      {
+       "post_mean": 17.0,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -1.3000000000000007
+      },
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.1,
+       "probe_round": 120,
+       "response": -0.7000000000000028
+      }
+     ],
+     "session_index": 28,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_a",
+     "markup": 26.717948717948715,
+     "mean_half_spread": 17.358974358974358,
+     "mean_probe_response": -3.766666666666667,
+     "probes": [
+      {
+       "post_mean": 17.8,
+       "pre_mean": 18.3,
+       "probe_round": 80,
+       "response": -0.5
+      },
+      {
+       "post_mean": 16.2,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -2.1000000000000014
+      },
+      {
+       "post_mean": 9.8,
+       "pre_mean": 18.5,
+       "probe_round": 120,
+       "response": -8.7
+      }
+     ],
+     "session_index": 29,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    }
+   ]
+  },
+  "duo_llm_b": {
+   "mean_markup": 17.348717948717947,
+   "n_sessions": 30,
+   "sessions": [
+    {
+     "cell": "duo_llm_b",
+     "markup": 20.974358974358974,
+     "mean_half_spread": 14.487179487179487,
+     "mean_probe_response": -0.43333333333333296,
+     "probes": [
+      {
+       "post_mean": 10.8,
+       "pre_mean": 13.7,
+       "probe_round": 80,
+       "response": -2.8999999999999986
+      },
+      {
+       "post_mean": 12.8,
+       "pre_mean": 8.8,
+       "probe_round": 100,
+       "response": 4.0
+      },
+      {
+       "post_mean": 12.0,
+       "pre_mean": 14.4,
+       "probe_round": 120,
+       "response": -2.4000000000000004
+      }
+     ],
+     "session_index": 0,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 21.94871794871795,
+     "mean_half_spread": 14.974358974358974,
+     "mean_probe_response": -2.066666666666667,
+     "probes": [
+      {
+       "post_mean": 8.8,
+       "pre_mean": 14.4,
+       "probe_round": 80,
+       "response": -5.6
+      },
+      {
+       "post_mean": 11.6,
+       "pre_mean": 11.1,
+       "probe_round": 100,
+       "response": 0.5
+      },
+      {
+       "post_mean": 14.2,
+       "pre_mean": 15.3,
+       "probe_round": 120,
+       "response": -1.1000000000000014
+      }
+     ],
+     "session_index": 1,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 20.76923076923077,
+     "mean_half_spread": 14.384615384615385,
+     "mean_probe_response": -3.5999999999999996,
+     "probes": [
+      {
+       "post_mean": 15.4,
+       "pre_mean": 17.9,
+       "probe_round": 80,
+       "response": -2.4999999999999982
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 18.3,
+       "probe_round": 100,
+       "response": -4.700000000000001
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 14.0,
+       "probe_round": 120,
+       "response": -3.5999999999999996
+      }
+     ],
+     "session_index": 2,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 23.794871794871796,
+     "mean_half_spread": 15.897435897435898,
+     "mean_probe_response": -3.4,
+     "probes": [
+      {
+       "post_mean": 17.0,
+       "pre_mean": 18.2,
+       "probe_round": 80,
+       "response": -1.1999999999999993
+      },
+      {
+       "post_mean": 14.2,
+       "pre_mean": 18.7,
+       "probe_round": 100,
+       "response": -4.5
+      },
+      {
+       "post_mean": 10.2,
+       "pre_mean": 14.7,
+       "probe_round": 120,
+       "response": -4.5
+      }
+     ],
+     "session_index": 3,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 23.641025641025642,
+     "mean_half_spread": 15.820512820512821,
+     "mean_probe_response": -2.9666666666666672,
+     "probes": [
+      {
+       "post_mean": 17.4,
+       "pre_mean": 18.6,
+       "probe_round": 80,
+       "response": -1.2000000000000028
+      },
+      {
+       "post_mean": 15.0,
+       "pre_mean": 18.4,
+       "probe_round": 100,
+       "response": -3.3999999999999986
+      },
+      {
+       "post_mean": 10.2,
+       "pre_mean": 14.5,
+       "probe_round": 120,
+       "response": -4.300000000000001
+      }
+     ],
+     "session_index": 4,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 26.87179487179487,
+     "mean_half_spread": 17.435897435897434,
+     "mean_probe_response": -1.5666666666666664,
+     "probes": [
+      {
+       "post_mean": 14.8,
+       "pre_mean": 18.5,
+       "probe_round": 80,
+       "response": -3.6999999999999993
+      },
+      {
+       "post_mean": 11.0,
+       "pre_mean": 14.5,
+       "probe_round": 100,
+       "response": -3.5
+      },
+      {
+       "post_mean": 12.8,
+       "pre_mean": 10.3,
+       "probe_round": 120,
+       "response": 2.5
+      }
+     ],
+     "session_index": 5,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 22.615384615384617,
+     "mean_half_spread": 15.307692307692308,
+     "mean_probe_response": -2.8666666666666667,
+     "probes": [
+      {
+       "post_mean": 10.4,
+       "pre_mean": 14.5,
+       "probe_round": 80,
+       "response": -4.1
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 14.6,
+       "probe_round": 100,
+       "response": -4.199999999999999
+      },
+      {
+       "post_mean": 10.2,
+       "pre_mean": 10.5,
+       "probe_round": 120,
+       "response": -0.3000000000000007
+      }
+     ],
+     "session_index": 6,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 17.76923076923077,
+     "mean_half_spread": 12.884615384615385,
+     "mean_probe_response": -2.4666666666666663,
+     "probes": [
+      {
+       "post_mean": 13.4,
+       "pre_mean": 14.5,
+       "probe_round": 80,
+       "response": -1.0999999999999996
+      },
+      {
+       "post_mean": 11.6,
+       "pre_mean": 14.2,
+       "probe_round": 100,
+       "response": -2.5999999999999996
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 14.1,
+       "probe_round": 120,
+       "response": -3.6999999999999993
+      }
+     ],
+     "session_index": 7,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 12.923076923076923,
+     "mean_half_spread": 10.461538461538462,
+     "mean_probe_response": -0.40000000000000097,
+     "probes": [
+      {
+       "post_mean": 11.2,
+       "pre_mean": 13.9,
+       "probe_round": 80,
+       "response": -2.700000000000001
+      },
+      {
+       "post_mean": 12.6,
+       "pre_mean": 9.8,
+       "probe_round": 100,
+       "response": 2.799999999999999
+      },
+      {
+       "post_mean": 13.0,
+       "pre_mean": 14.3,
+       "probe_round": 120,
+       "response": -1.3000000000000007
+      }
+     ],
+     "session_index": 8,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 21.53846153846154,
+     "mean_half_spread": 14.76923076923077,
+     "mean_probe_response": -1.8,
+     "probes": [
+      {
+       "post_mean": 8.8,
+       "pre_mean": 14.1,
+       "probe_round": 80,
+       "response": -5.299999999999999
+      },
+      {
+       "post_mean": 11.6,
+       "pre_mean": 6.9,
+       "probe_round": 100,
+       "response": 4.699999999999999
+      },
+      {
+       "post_mean": 10.2,
+       "pre_mean": 15.0,
+       "probe_round": 120,
+       "response": -4.800000000000001
+      }
+     ],
+     "session_index": 9,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 12.282051282051281,
+     "mean_half_spread": 10.14102564102564,
+     "mean_probe_response": -2.0,
+     "probes": [
+      {
+       "post_mean": 14.6,
+       "pre_mean": 15.7,
+       "probe_round": 80,
+       "response": -1.0999999999999996
+      },
+      {
+       "post_mean": 11.0,
+       "pre_mean": 13.9,
+       "probe_round": 100,
+       "response": -2.9000000000000004
+      },
+      {
+       "post_mean": 14.2,
+       "pre_mean": 16.2,
+       "probe_round": 120,
+       "response": -2.0
+      }
+     ],
+     "session_index": 10,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 18.46153846153846,
+     "mean_half_spread": 13.23076923076923,
+     "mean_probe_response": -1.4333333333333336,
+     "probes": [
+      {
+       "post_mean": 14.2,
+       "pre_mean": 14.9,
+       "probe_round": 80,
+       "response": -0.7000000000000011
+      },
+      {
+       "post_mean": 15.6,
+       "pre_mean": 17.9,
+       "probe_round": 100,
+       "response": -2.299999999999999
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 14.9,
+       "probe_round": 120,
+       "response": -1.3000000000000007
+      }
+     ],
+     "session_index": 11,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 11.358974358974358,
+     "mean_half_spread": 9.679487179487179,
+     "mean_probe_response": -2.399999999999999,
+     "probes": [
+      {
+       "post_mean": 10.8,
+       "pre_mean": 12.2,
+       "probe_round": 80,
+       "response": -1.3999999999999986
+      },
+      {
+       "post_mean": 10.8,
+       "pre_mean": 11.7,
+       "probe_round": 100,
+       "response": -0.8999999999999986
+      },
+      {
+       "post_mean": 9.2,
+       "pre_mean": 14.1,
+       "probe_round": 120,
+       "response": -4.9
+      }
+     ],
+     "session_index": 12,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 8.692307692307693,
+     "mean_half_spread": 8.346153846153847,
+     "mean_probe_response": -0.8333333333333334,
+     "probes": [
+      {
+       "post_mean": 10.8,
+       "pre_mean": 10.4,
+       "probe_round": 80,
+       "response": 0.40000000000000036
+      },
+      {
+       "post_mean": 14.6,
+       "pre_mean": 17.4,
+       "probe_round": 100,
+       "response": -2.799999999999999
+      },
+      {
+       "post_mean": 14.2,
+       "pre_mean": 14.3,
+       "probe_round": 120,
+       "response": -0.10000000000000142
+      }
+     ],
+     "session_index": 13,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 28.564102564102562,
+     "mean_half_spread": 18.28205128205128,
+     "mean_probe_response": -2.433333333333334,
+     "probes": [
+      {
+       "post_mean": 16.2,
+       "pre_mean": 18.6,
+       "probe_round": 80,
+       "response": -2.400000000000002
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 15.0,
+       "probe_round": 100,
+       "response": -1.4000000000000004
+      },
+      {
+       "post_mean": 11.0,
+       "pre_mean": 14.5,
+       "probe_round": 120,
+       "response": -3.5
+      }
+     ],
+     "session_index": 14,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 28.641025641025642,
+     "mean_half_spread": 18.32051282051282,
+     "mean_probe_response": -3.0666666666666664,
+     "probes": [
+      {
+       "post_mean": 15.8,
+       "pre_mean": 17.9,
+       "probe_round": 80,
+       "response": -2.099999999999998
+      },
+      {
+       "post_mean": 14.2,
+       "pre_mean": 18.6,
+       "probe_round": 100,
+       "response": -4.400000000000002
+      },
+      {
+       "post_mean": 11.8,
+       "pre_mean": 14.5,
+       "probe_round": 120,
+       "response": -2.6999999999999993
+      }
+     ],
+     "session_index": 15,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 23.58974358974359,
+     "mean_half_spread": 15.794871794871796,
+     "mean_probe_response": -2.9333333333333336,
+     "probes": [
+      {
+       "post_mean": 14.2,
+       "pre_mean": 18.6,
+       "probe_round": 80,
+       "response": -4.400000000000002
+      },
+      {
+       "post_mean": 11.6,
+       "pre_mean": 14.2,
+       "probe_round": 100,
+       "response": -2.5999999999999996
+      },
+      {
+       "post_mean": 13.8,
+       "pre_mean": 15.6,
+       "probe_round": 120,
+       "response": -1.799999999999999
+      }
+     ],
+     "session_index": 16,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 15.282051282051281,
+     "mean_half_spread": 11.64102564102564,
+     "mean_probe_response": -2.8333333333333335,
+     "probes": [
+      {
+       "post_mean": 10.8,
+       "pre_mean": 14.3,
+       "probe_round": 80,
+       "response": -3.5
+      },
+      {
+       "post_mean": 11.0,
+       "pre_mean": 14.1,
+       "probe_round": 100,
+       "response": -3.0999999999999996
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 15.5,
+       "probe_round": 120,
+       "response": -1.9000000000000004
+      }
+     ],
+     "session_index": 17,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 10.76923076923077,
+     "mean_half_spread": 9.384615384615385,
+     "mean_probe_response": -2.033333333333333,
+     "probes": [
+      {
+       "post_mean": 14.2,
+       "pre_mean": 13.7,
+       "probe_round": 80,
+       "response": 0.5
+      },
+      {
+       "post_mean": 11.0,
+       "pre_mean": 16.5,
+       "probe_round": 100,
+       "response": -5.5
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 14.7,
+       "probe_round": 120,
+       "response": -1.0999999999999996
+      }
+     ],
+     "session_index": 18,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 9.256410256410255,
+     "mean_half_spread": 8.628205128205128,
+     "mean_probe_response": -1.1999999999999995,
+     "probes": [
+      {
+       "post_mean": 6.8,
+       "pre_mean": 7.9,
+       "probe_round": 80,
+       "response": -1.1000000000000005
+      },
+      {
+       "post_mean": 10.8,
+       "pre_mean": 11.1,
+       "probe_round": 100,
+       "response": -0.29999999999999893
+      },
+      {
+       "post_mean": 12.0,
+       "pre_mean": 14.2,
+       "probe_round": 120,
+       "response": -2.1999999999999993
+      }
+     ],
+     "session_index": 19,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 8.076923076923077,
+     "mean_half_spread": 8.038461538461538,
+     "mean_probe_response": 0.4999999999999997,
+     "probes": [
+      {
+       "post_mean": 10.8,
+       "pre_mean": 10.3,
+       "probe_round": 80,
+       "response": 0.5
+      },
+      {
+       "post_mean": 9.4,
+       "pre_mean": 7.7,
+       "probe_round": 100,
+       "response": 1.7000000000000002
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 14.3,
+       "probe_round": 120,
+       "response": -0.7000000000000011
+      }
+     ],
+     "session_index": 20,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 18.794871794871796,
+     "mean_half_spread": 13.397435897435898,
+     "mean_probe_response": -2.433333333333332,
+     "probes": [
+      {
+       "post_mean": 13.6,
+       "pre_mean": 16.5,
+       "probe_round": 80,
+       "response": -2.9000000000000004
+      },
+      {
+       "post_mean": 16.6,
+       "pre_mean": 17.4,
+       "probe_round": 100,
+       "response": -0.7999999999999972
+      },
+      {
+       "post_mean": 14.8,
+       "pre_mean": 18.4,
+       "probe_round": 120,
+       "response": -3.599999999999998
+      }
+     ],
+     "session_index": 21,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 11.410256410256409,
+     "mean_half_spread": 9.705128205128204,
+     "mean_probe_response": -0.933333333333333,
+     "probes": [
+      {
+       "post_mean": 11.8,
+       "pre_mean": 13.7,
+       "probe_round": 80,
+       "response": -1.8999999999999986
+      },
+      {
+       "post_mean": 13.8,
+       "pre_mean": 14.3,
+       "probe_round": 100,
+       "response": -0.5
+      },
+      {
+       "post_mean": 14.2,
+       "pre_mean": 14.6,
+       "probe_round": 120,
+       "response": -0.40000000000000036
+      }
+     ],
+     "session_index": 22,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 21.641025641025642,
+     "mean_half_spread": 14.820512820512821,
+     "mean_probe_response": -2.133333333333333,
+     "probes": [
+      {
+       "post_mean": 13.8,
+       "pre_mean": 14.1,
+       "probe_round": 80,
+       "response": -0.29999999999999893
+      },
+      {
+       "post_mean": 14.4,
+       "pre_mean": 16.4,
+       "probe_round": 100,
+       "response": -1.9999999999999982
+      },
+      {
+       "post_mean": 10.2,
+       "pre_mean": 14.3,
+       "probe_round": 120,
+       "response": -4.100000000000001
+      }
+     ],
+     "session_index": 23,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 11.743589743589745,
+     "mean_half_spread": 9.871794871794872,
+     "mean_probe_response": -1.666666666666666,
+     "probes": [
+      {
+       "post_mean": 13.8,
+       "pre_mean": 13.9,
+       "probe_round": 80,
+       "response": -0.09999999999999964
+      },
+      {
+       "post_mean": 12.8,
+       "pre_mean": 14.6,
+       "probe_round": 100,
+       "response": -1.799999999999999
+      },
+      {
+       "post_mean": 11.4,
+       "pre_mean": 14.5,
+       "probe_round": 120,
+       "response": -3.0999999999999996
+      }
+     ],
+     "session_index": 24,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 22.076923076923077,
+     "mean_half_spread": 15.038461538461538,
+     "mean_probe_response": -1.9666666666666661,
+     "probes": [
+      {
+       "post_mean": 14.2,
+       "pre_mean": 14.4,
+       "probe_round": 80,
+       "response": -0.20000000000000107
+      },
+      {
+       "post_mean": 10.8,
+       "pre_mean": 15.7,
+       "probe_round": 100,
+       "response": -4.899999999999999
+      },
+      {
+       "post_mean": 10.8,
+       "pre_mean": 11.6,
+       "probe_round": 120,
+       "response": -0.7999999999999989
+      }
+     ],
+     "session_index": 25,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 10.512820512820515,
+     "mean_half_spread": 9.256410256410257,
+     "mean_probe_response": -3.1,
+     "probes": [
+      {
+       "post_mean": 10.8,
+       "pre_mean": 13.0,
+       "probe_round": 80,
+       "response": -2.1999999999999993
+      },
+      {
+       "post_mean": 11.6,
+       "pre_mean": 13.9,
+       "probe_round": 100,
+       "response": -2.3000000000000007
+      },
+      {
+       "post_mean": 10.0,
+       "pre_mean": 14.8,
+       "probe_round": 120,
+       "response": -4.800000000000001
+      }
+     ],
+     "session_index": 26,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 8.923076923076923,
+     "mean_half_spread": 8.461538461538462,
+     "mean_probe_response": -3.566666666666666,
+     "probes": [
+      {
+       "post_mean": 10.0,
+       "pre_mean": 12.1,
+       "probe_round": 80,
+       "response": -2.0999999999999996
+      },
+      {
+       "post_mean": 10.0,
+       "pre_mean": 14.2,
+       "probe_round": 100,
+       "response": -4.199999999999999
+      },
+      {
+       "post_mean": 9.8,
+       "pre_mean": 14.2,
+       "probe_round": 120,
+       "response": -4.399999999999999
+      }
+     ],
+     "session_index": 27,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 8.0,
+     "mean_half_spread": 8.0,
+     "mean_probe_response": -5.921189464667501e-16,
+     "probes": [
+      {
+       "post_mean": 11.0,
+       "pre_mean": 10.3,
+       "probe_round": 80,
+       "response": 0.6999999999999993
+      },
+      {
+       "post_mean": 11.0,
+       "pre_mean": 14.3,
+       "probe_round": 100,
+       "response": -3.3000000000000007
+      },
+      {
+       "post_mean": 13.6,
+       "pre_mean": 11.0,
+       "probe_round": 120,
+       "response": 2.5999999999999996
+      }
+     ],
+     "session_index": 28,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    },
+    {
+     "cell": "duo_llm_b",
+     "markup": 19.53846153846154,
+     "mean_half_spread": 13.76923076923077,
+     "mean_probe_response": -1.666666666666666,
+     "probes": [
+      {
+       "post_mean": 9.8,
+       "pre_mean": 14.5,
+       "probe_round": 80,
+       "response": -4.699999999999999
+      },
+      {
+       "post_mean": 10.8,
+       "pre_mean": 11.6,
+       "probe_round": 100,
+       "response": -0.7999999999999989
+      },
+      {
+       "post_mean": 10.4,
+       "pre_mean": 9.9,
+       "probe_round": 120,
+       "response": 0.5
+      }
+     ],
+     "session_index": 29,
+     "validity": {
+      "first_attempt_rate": 1.0,
+      "forced_passes": 0,
+      "n_llm_calls": 300,
+      "n_llm_polls": 300,
+      "validity_rate": 1.0
+     }
+    }
+   ]
+  }
+ },
+ "experiment_id": "duopoly_h3"
+}

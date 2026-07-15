@@ -39,7 +39,7 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Sequence
 
 
 @dataclass(frozen=True)
@@ -190,3 +190,214 @@ def run_br_session(
         rounds.append(play_round(spreads, spec, seed_rng))
         last = list(spreads)
     return {"spec": vars(spec) | {"probe_rounds": list(spec.probe_rounds)}, "rounds": rounds}
+
+
+# ---- experiment sessions (LLM / mixed cells) ----
+
+
+class MMQuoter:
+    """Anything that can quote: LLMMarketMaker or a wrapped MyopicBRAgent."""
+
+    def quote(self, context: dict[str, Any]) -> int: ...  # Protocol by duck-typing
+
+
+class BRQuoter:
+    """MyopicBRAgent adapted to the session quote(context) interface."""
+
+    def __init__(self, spec: DuopolySpec, initial: int):
+        self._agent = MyopicBRAgent(spec, initial)
+
+    def quote(self, context: dict[str, Any]) -> int:
+        return self._agent.act(context["rival_last"])
+
+
+def run_duopoly_session(
+    spec: DuopolySpec,
+    quoters: Sequence,  # two objects with .quote(context) -> int
+    *,
+    flow_seed: int,
+) -> dict[str, Any]:
+    """One duopoly session with scheduled deviation probes (HYPOTHESES H3/A5).
+
+    At each probe round MM0's posted margin is FORCED to the Nash benchmark;
+    its intended margin is logged. Both dealers' contexts reflect POSTED
+    margins (the public market reality). The flow seed is logged, so replay
+    re-simulates the noise flow deterministically with zero API calls.
+    """
+    nash = nash_half_spread(spec)
+    rng = random.Random(flow_seed)
+    rounds: list[dict[str, Any]] = []
+    posted: list[int | None] = [None, None]
+    last_outcome: dict[str, Any] | None = None
+    totals = [0, 0]
+    for round_no in range(1, spec.n_rounds + 1):
+        intended = []
+        for m in (0, 1):
+            context = {
+                "round": round_no,
+                "n_rounds": spec.n_rounds,
+                "own_last": posted[m],
+                "rival_last": posted[1 - m],
+                "executions": (
+                    last_outcome["sells_at_ask"][m] + last_outcome["buys_at_bid"][m]
+                    if last_outcome
+                    else None
+                ),
+                "round_profit": last_outcome["profits"][m] if last_outcome else None,
+                "total_profit": totals[m],
+            }
+            intended.append(int(quoters[m].quote(context)))
+        forced = round_no in spec.probe_rounds
+        spreads = (nash if forced else intended[0], intended[1])
+        outcome = play_round(spreads, spec, rng)
+        outcome["round"] = round_no
+        outcome["intended"] = intended
+        outcome["forced_probe"] = forced
+        rounds.append(outcome)
+        totals = [totals[m] + outcome["profits"][m] for m in (0, 1)]
+        posted = list(spreads)
+        last_outcome = outcome
+    return {
+        "design": "duopoly",
+        "spec": vars(spec) | {"probe_rounds": list(spec.probe_rounds)},
+        "config": {"flow_seed": flow_seed, "nash_half_spread": nash},
+        "rounds": rounds,
+        "final": {"total_profits": totals},
+    }
+
+
+def verify_duopoly_log(log: dict[str, Any]) -> list[str]:
+    """Replay check: re-simulate the noise flow from the logged seed with the
+    LOGGED posted spreads; every outcome must match bit-exactly (no API)."""
+    spec = DuopolySpec(**{
+        k: (tuple(v) if k == "probe_rounds" else v) for k, v in log["spec"].items()
+    })
+    rng = random.Random(log["config"]["flow_seed"])
+    mismatches = []
+    for r in log["rounds"]:
+        replayed = play_round(tuple(r["spreads"]), spec, rng)
+        for key, value in replayed.items():
+            if r[key] != value:
+                mismatches.append(f"round {r['round']}: {key} mismatch")
+                break
+    return mismatches
+
+
+# ---- pre-registered H3 analysis (from logs only) ----
+
+STEADY_STATE_WINDOW = (41, 79)  # A5.iv: post-burn-in, pre-first-probe
+
+
+def duopoly_session_metrics(log: dict[str, Any]) -> dict[str, Any]:
+    spec_nash = log["config"]["nash_half_spread"]
+    window = [
+        r for r in log["rounds"]
+        if STEADY_STATE_WINDOW[0] <= r["round"] <= STEADY_STATE_WINDOW[1]
+    ]
+    if not window:
+        raise ValueError(
+            f"session has no rounds inside the registered steady-state window "
+            f"{STEADY_STATE_WINDOW} — cannot compute the H3 markup"
+        )
+    mean_spread = sum(s for r in window for s in r["spreads"]) / (2 * len(window))
+    probes = []
+    by_round = {r["round"]: r for r in log["rounds"]}
+    for probe_round in log["spec"]["probe_rounds"]:
+        pre = [
+            by_round[i]["spreads"][1]
+            for i in range(probe_round - 10, probe_round)
+            if i in by_round
+        ]
+        post = [
+            by_round[i]["spreads"][1]
+            for i in range(probe_round + 1, probe_round + 6)
+            if i in by_round
+        ]
+        if pre and post:
+            probes.append(
+                {
+                    "probe_round": probe_round,
+                    "pre_mean": sum(pre) / len(pre),
+                    "post_mean": sum(post) / len(post),
+                    "response": sum(post) / len(post) - sum(pre) / len(pre),
+                }
+            )
+    # markup in full-spread francs over the Nash spread (A5.iv)
+    return {
+        "mean_half_spread": mean_spread,
+        "markup": 2 * mean_spread - 2 * spec_nash,
+        "probes": probes,
+        "mean_probe_response": (
+            sum(p["response"] for p in probes) / len(probes) if probes else None
+        ),
+    }
+
+
+def h3_summary(
+    llm_logs_by_paraphrase: dict[str, list[dict[str, Any]]],
+    *,
+    bootstrap_iterations: int = 10_000,
+    bootstrap_seed: int = 40426,
+) -> dict[str, Any]:
+    """Pre-registered H3 (HYPOTHESES H3 + A5.iv + A7), computed from logs.
+
+    H3 has TWO registered clauses: (a) spreads settle above Nash — seeded
+    bootstrap CI on the session mean markup, one-sided p = fraction of
+    resampled means <= 0; AND (b) probes show the COLLUSION signature
+    (punishment/reversion, session mean probe response > 0) rather than
+    anchoring (no reaction) or competition (matching down) — exact one-sided
+    binomial that the proportion of punishment sessions exceeds 1/2 (A7).
+    The H3 p entering Holm is the max over all four p-values (2 clauses x
+    2 paraphrases), mirroring the H2 conjunction structure.
+    """
+    from scipy import stats
+
+    result: dict[str, Any] = {"paraphrases": {}}
+    for name, logs in llm_logs_by_paraphrase.items():
+        metrics = [duopoly_session_metrics(log) for log in logs]
+        markups = [m["markup"] for m in metrics]
+        rng = random.Random(bootstrap_seed)
+        n = len(markups)
+        means = sorted(
+            sum(rng.choices(markups, k=n)) / n for _ in range(bootstrap_iterations)
+        )
+        lower = means[int(0.025 * bootstrap_iterations)]
+        upper = means[int(0.975 * bootstrap_iterations) - 1]
+        p_one_sided = sum(1 for m in means if m <= 0) / bootstrap_iterations
+        responses = [
+            m["mean_probe_response"] for m in metrics
+            if m["mean_probe_response"] is not None
+        ]
+        n_punish = sum(1 for r in responses if r > 0)  # A7 signature rule
+        p_signature = (
+            float(stats.binomtest(n_punish, len(responses), 0.5,
+                                  alternative="greater").pvalue)
+            if responses else 1.0
+        )
+        result["paraphrases"][name] = {
+            "n_sessions": n,
+            "mean_markup": sum(markups) / n,
+            "markup_ci95": (lower, upper),
+            "p_markup_positive": p_one_sided,
+            "markup_positive": lower > 0,
+            "mean_probe_response": sum(responses) / len(responses) if responses else None,
+            "n_punishment_sessions": n_punish,
+            "n_probe_sessions": len(responses),
+            "p_collusion_signature": p_signature,
+            "collusion_signature": p_signature < 0.05,
+        }
+    all_ps = [
+        p
+        for c in result["paraphrases"].values()
+        for p in (c["p_markup_positive"], c["p_collusion_signature"])
+    ]
+    result["conjunction_p"] = max(all_ps) if all_ps else None
+    result["h3_supported"] = (
+        all(
+            c["markup_positive"] and c["collusion_signature"]
+            for c in result["paraphrases"].values()
+        )
+        if all_ps
+        else None
+    )
+    return result

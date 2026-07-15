@@ -13,7 +13,7 @@ market:
   traders_per_class: 2
   price_low: 1
   price_high: 720
-  steps_per_period: 120   # keep equal to ssw_h2 (A4 pilot value)
+  steps_per_period: 60    # keep equal to ssw_h2 (fixed by HYPOTHESES A4)
 cells:
   - name: ssw_mixed
     agent_type: mixed

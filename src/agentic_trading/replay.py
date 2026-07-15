@@ -22,6 +22,7 @@ def traders_from_log(log: dict[str, Any]) -> list[TraderConfig]:
             cash=t["cash"],
             values=tuple(t["values"]),
             costs=tuple(t["costs"]),
+            endowed_units=t.get("endowed_units", 0),
         )
         for t in log["traders"]
     ]
@@ -34,7 +35,9 @@ def replay_session_log(log: dict[str, Any]) -> dict[str, Any]:
     are carried through unchanged, so a replayed log is byte-identical to
     the original — replay must never strip provenance.
     """
-    exchange = Exchange(traders_from_log(log))
+    exchange = Exchange(
+        traders_from_log(log), carry_over=log.get("carry_over", False)
+    )
     for event_dict in log["events"]:
         exchange.apply(event_from_dict(event_dict))
     replayed = exchange.session_log()

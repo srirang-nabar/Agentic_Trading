@@ -32,6 +32,7 @@ import yaml
 
 from agentic_trading.exchange import (
     Cancel,
+    Dividend,
     Exchange,
     Pass,
     PeriodClose,
@@ -72,6 +73,10 @@ class AgentView:
     remaining_costs: tuple[int, ...]
     open_orders: tuple[tuple[int, str, int], ...]  # (order_id, side, price)
     recent_trade_prices: tuple[int, ...] = ()  # last 10 this session, oldest first
+    # carry-over institutions (SSW) only: total periods, so agents/renderers
+    # can state remaining payouts; None marks a per-period (Smith) view, in
+    # which schedule-based validation applies.
+    n_periods: int | None = None
 
 
 class Agent(Protocol):
@@ -112,7 +117,59 @@ def run_session(
     return log
 
 
-def _view(exchange: Exchange, trader_id: str, step: int) -> AgentView:
+def run_ssw_session(
+    market: "Any",  # experiments.ssw.SSWMarket
+    agents: dict[str, Agent],
+    *,
+    steps_per_period: int,
+    poll_seed: int,
+) -> dict[str, Any]:
+    """Run one SSW session (carry-over endowments + per-period dividends).
+
+    Identical activation protocol to run_session. The realized dividend is
+    applied as a Dividend EVENT after each period close, so the event log
+    stays the complete session input and replay needs no RNG (HYPOTHESES A3).
+    """
+    spec = market.spec
+    traders = [
+        TraderConfig(trader_id=tid, cash=cash, endowed_units=shares)
+        for tid, cash, shares in market.traders
+    ]
+    trader_ids = sorted(t.trader_id for t in traders)
+    if sorted(agents) != trader_ids:
+        raise ValueError("agents must match traders exactly")
+
+    exchange = Exchange(traders, carry_over=True)
+    rng = random.Random(poll_seed)
+
+    for period in range(1, spec.n_periods + 1):
+        exchange.apply(PeriodOpen())
+        for step in range(steps_per_period):
+            trader_id = trader_ids[rng.randrange(len(trader_ids))]
+            view = _view(exchange, trader_id, step, n_periods=spec.n_periods)
+            action = agents[trader_id].act(view)
+            exchange.apply(_to_event(trader_id, action))
+        exchange.apply(PeriodClose())
+        exchange.apply(Dividend(amount=market.dividends[period - 1]))
+
+    log = exchange.session_log()
+    log["config"] = {
+        "n_periods": spec.n_periods,
+        "steps_per_period": steps_per_period,
+        "poll_seed": poll_seed,
+        "activation": "uniform_random_polling",
+    }
+    log["ssw"] = {
+        "dividend_values": list(spec.dividend_values),
+        "dividends": list(market.dividends),
+        "shares_outstanding": spec.shares_outstanding,
+    }
+    return log
+
+
+def _view(
+    exchange: Exchange, trader_id: str, step: int, n_periods: int | None = None
+) -> AgentView:
     acct = exchange.account(trader_id)
     cfg = exchange.config(trader_id)
     bid = exchange.best_bid()
@@ -132,6 +189,7 @@ def _view(exchange: Exchange, trader_id: str, step: int) -> AgentView:
         remaining_costs=cfg.costs[acct["n_sold"] + acct["n_open_asks"]:],
         open_orders=open_orders,
         recent_trade_prices=tuple(t["price"] for t in exchange.trades[-10:]),
+        n_periods=n_periods,
     )
 
 
@@ -172,8 +230,14 @@ def run_experiment(
     JSON session log per line), config.yaml copied alongside, summary.json
     with per-session metrics, and a refreshed results/MANIFEST.sha256.
     """
-    from agentic_trading.agents.zi import build_zi_agents
+    from agentic_trading.agents.zi import build_ssw_zi_agents, build_zi_agents
+    from agentic_trading.bubbles import ssw_metrics
     from agentic_trading.experiments.smith import SmithMarketSpec, generate_smith_market
+    from agentic_trading.experiments.ssw import (
+        SSWMarketSpec,
+        generate_ssw_market,
+        render_experience,
+    )
     from agentic_trading.metrics import session_metrics
     from agentic_trading.replay import session_log_to_json
 
@@ -182,15 +246,41 @@ def run_experiment(
     experiment_id = config["experiment_id"]
     base_seed = config["seed"]
     market_cfg = config["market"]
-    spec = SmithMarketSpec(
-        n_buyers=market_cfg["n_buyers"],
-        n_sellers=market_cfg["n_sellers"],
-        units_per_trader=market_cfg["units_per_trader"],
-        price_low=market_cfg["price_low"],
-        price_high=market_cfg["price_high"],
-        cash_endowment=market_cfg["cash_endowment"],
-        min_equilibrium_quantity=market_cfg.get("min_equilibrium_quantity", 3),
-    )
+    design = config.get("design", "smith")
+    if design == "smith":
+        spec = SmithMarketSpec(
+            n_buyers=market_cfg["n_buyers"],
+            n_sellers=market_cfg["n_sellers"],
+            units_per_trader=market_cfg["units_per_trader"],
+            price_low=market_cfg["price_low"],
+            price_high=market_cfg["price_high"],
+            cash_endowment=market_cfg["cash_endowment"],
+            min_equilibrium_quantity=market_cfg.get("min_equilibrium_quantity", 3),
+        )
+    elif design == "ssw":
+        spec = SSWMarketSpec(
+            n_periods=market_cfg["n_periods"],
+            dividend_values=tuple(market_cfg["dividend_values"]),
+            endowment_classes=tuple(
+                (int(c), int(s)) for c, s in market_cfg["endowment_classes"]
+            ),
+            traders_per_class=market_cfg["traders_per_class"],
+            price_low=market_cfg["price_low"],
+            price_high=market_cfg["price_high"],
+        )
+    elif design == "duopoly":
+        from agentic_trading.experiments.duopoly import DuopolySpec
+
+        spec = DuopolySpec(
+            reference_value=market_cfg["reference_value"],
+            arrival_rate=market_cfg["arrival_rate"],
+            inventory_phi=market_cfg["inventory_phi"],
+            max_half_spread=market_cfg["max_half_spread"],
+            n_rounds=market_cfg["n_rounds"],
+            probe_rounds=tuple(market_cfg["probe_rounds"]),
+        )
+    else:
+        raise ValueError(f"unknown design: {design!r}")
 
     results_root = Path(results_root)
     out_dir = results_root / experiment_id
@@ -206,43 +296,157 @@ def run_experiment(
     for cell in config["cells"]:
         cell_name = cell["name"]
         seed_scope = "shared" if seed_scope_shared else cell_name
-        is_llm = cell["agent_type"] == "llm"
+        is_llm = cell["agent_type"] in ("llm", "mixed")
         # Pure-simulation cells stay sequential so their gzip output remains
         # bit-reproducible; LLM cells are I/O-bound and parallelize safely
         # (independent sessions, one client+recorder each).
         parallel = int(config.get("parallel_sessions", 1)) if is_llm else 1
 
-        def run_one(index: int, cell=cell, cell_name=cell_name, seed_scope=seed_scope):
-            market_rng = random.Random(derive_seed(base_seed, seed_scope, index, "market"))
-            traders, eq = generate_smith_market(market_rng, spec)
-            if cell["agent_type"] in ("zi_c", "zi_u"):
-                agents = build_zi_agents(
-                    traders,
-                    kind=cell["agent_type"],
-                    max_price=spec.price_high,
-                    seed_for=lambda tid, i=index: derive_seed(base_seed, cell_name, i, "agent", tid),
-                )
-                recorder = None
-            elif cell["agent_type"] == "llm":
-                agents, recorder = _build_llm_agents(traders, cell["llm"], spec.price_high)
-            else:
-                raise ValueError(f"unknown agent_type: {cell['agent_type']!r}")
-            log = run_session(
-                traders,
-                agents,
-                n_periods=market_cfg["n_periods"],
-                steps_per_period=market_cfg["steps_per_period"],
-                poll_seed=derive_seed(base_seed, seed_scope, index, "poll"),
+        # Experience treatment (A3.iii-iv): the source cell must appear
+        # earlier in the config; its committed logs supply the transcripts,
+        # and the dividend seed is tagged so the fresh path can't be leaked
+        # by the transcript.
+        experience_source = cell.get("experience_from")
+        experience_logs = (
+            load_session_logs(out_dir / "sessions" / f"{experience_source}.jsonl.gz")
+            if experience_source
+            else None
+        )
+
+        def run_one(index: int, cell=cell, cell_name=cell_name, seed_scope=seed_scope,
+                    experience_logs=experience_logs):
+            agent_type = cell["agent_type"]
+            market_tags = ("market", "experienced") if experience_logs else ("market",)
+            market_rng = random.Random(
+                derive_seed(base_seed, seed_scope, index, *market_tags)
             )
+            recorder = None
+            llm_agents = None
+            if design == "smith":
+                traders, eq = generate_smith_market(market_rng, spec)
+                if agent_type in ("zi_c", "zi_u"):
+                    agents = build_zi_agents(
+                        traders,
+                        kind=agent_type,
+                        max_price=spec.price_high,
+                        seed_for=lambda tid, i=index: derive_seed(base_seed, cell_name, i, "agent", tid),
+                    )
+                elif agent_type == "llm":
+                    agents, recorder = _build_llm_agents(traders, cell["llm"], spec.price_high)
+                    llm_agents = agents
+                else:
+                    raise ValueError(f"unknown agent_type: {agent_type!r}")
+                log = run_session(
+                    traders,
+                    agents,
+                    n_periods=market_cfg["n_periods"],
+                    steps_per_period=market_cfg["steps_per_period"],
+                    poll_seed=derive_seed(base_seed, seed_scope, index, "poll"),
+                )
+            elif design == "duopoly":
+                from agentic_trading.experiments.duopoly import (
+                    BRQuoter,
+                    duopoly_session_metrics,
+                    run_duopoly_session,
+                )
+
+                mm_ids = ["MM0", "MM1"]
+                llm_ids = (
+                    mm_ids if agent_type == "llm"
+                    else list(cell["mixed"]["llm_trader_ids"]) if agent_type == "mixed"
+                    else None
+                )
+                if llm_ids is None:
+                    raise ValueError(f"unknown agent_type: {agent_type!r}")
+                llm_agents, recorder = _build_llm_market_makers(
+                    llm_ids, cell["llm"], spec
+                )
+                quoters = []
+                for mm in mm_ids:
+                    if mm in llm_agents:
+                        quoters.append(llm_agents[mm])
+                    else:
+                        init_rng = random.Random(
+                            derive_seed(base_seed, cell_name, index, "agent", mm)
+                        )
+                        quoters.append(
+                            BRQuoter(spec, init_rng.randint(1, spec.max_half_spread))
+                        )
+                log = run_duopoly_session(
+                    spec,
+                    quoters,
+                    flow_seed=derive_seed(base_seed, seed_scope, index, "flow"),
+                )
+                log["meta"] = {
+                    "experiment_id": experiment_id,
+                    "cell": cell_name,
+                    "agent_type": agent_type,
+                    "session_index": index,
+                }
+                _attach_llm_capture(log, cell, llm_agents, recorder, coordination=True)
+                metrics = duopoly_session_metrics(log)
+                metrics["cell"] = cell_name
+                metrics["session_index"] = index
+                metrics["validity"] = log["meta"]["validity"]
+                return session_log_to_json(log), metrics
+            else:  # ssw
+                market = generate_ssw_market(spec, market_rng)
+                trader_configs = [
+                    TraderConfig(trader_id=tid, cash=cash, endowed_units=shares)
+                    for tid, cash, shares in market.traders
+                ]
+                all_ids = [t.trader_id for t in trader_configs]
+                llm_ids = (
+                    all_ids
+                    if agent_type == "llm"
+                    else list(cell["mixed"]["llm_trader_ids"])
+                    if agent_type == "mixed"
+                    else []
+                )
+                agents = {}
+                zi_ids = [tid for tid in all_ids if tid not in llm_ids]
+                if agent_type not in ("zi_c", "llm", "mixed"):
+                    raise ValueError(f"unknown agent_type: {agent_type!r}")
+                if zi_ids:
+                    agents.update(build_ssw_zi_agents(
+                        zi_ids,
+                        max_price=spec.price_high,
+                        seed_for=lambda tid, i=index: derive_seed(base_seed, cell_name, i, "agent", tid),
+                    ))
+                if llm_ids:
+                    experience_by_trader = (
+                        {tid: render_experience(experience_logs[index], tid) for tid in llm_ids}
+                        if experience_logs
+                        else None
+                    )
+                    llm_traders = [t for t in trader_configs if t.trader_id in llm_ids]
+                    llm_agents, recorder = _build_llm_agents(
+                        llm_traders,
+                        cell["llm"],
+                        spec.price_high,
+                        template_vars={
+                            "n_periods": spec.n_periods,
+                            "payouts": _payout_phrase(spec.dividend_values),
+                            "mean_payout": f"{spec.expected_dividend:g}",
+                        },
+                        experience_by_trader=experience_by_trader,
+                    )
+                    agents.update(llm_agents)
+                log = run_ssw_session(
+                    market,
+                    agents,
+                    steps_per_period=market_cfg["steps_per_period"],
+                    poll_seed=derive_seed(base_seed, seed_scope, index, "poll"),
+                )
             log["meta"] = {
                 "experiment_id": experiment_id,
                 "cell": cell_name,
-                "agent_type": cell["agent_type"],
+                "agent_type": agent_type,
                 "session_index": index,
             }
             if recorder is not None:
-                _attach_llm_capture(log, cell, agents, recorder)
-            metrics = session_metrics(log)
+                _attach_llm_capture(log, cell, llm_agents, recorder)
+            metrics = session_metrics(log) if design == "smith" else ssw_metrics(log)
             metrics["cell"] = cell_name
             metrics["session_index"] = index
             if recorder is not None:
@@ -255,14 +459,19 @@ def run_experiment(
             cell["n_sessions"],
             parallel,
         )
-        efficiencies = [s["efficiency"] for s in cell_sessions]
+        if design == "smith":
+            headline_key, values = "mean_efficiency", [s["efficiency"] for s in cell_sessions]
+        elif design == "duopoly":
+            headline_key, values = "mean_markup", [s["markup"] for s in cell_sessions]
+        else:
+            headline_key, values = "mean_rd", [s["rd"] for s in cell_sessions]
         summary["cells"][cell_name] = {
             "n_sessions": len(cell_sessions),
-            "mean_efficiency": sum(efficiencies) / len(efficiencies),
+            headline_key: sum(values) / len(values),
             "sessions": cell_sessions,
         }
         print(f"[{experiment_id}] {cell_name}: n={len(cell_sessions)} "
-              f"mean_efficiency={summary['cells'][cell_name]['mean_efficiency']:.3f}",
+              f"{headline_key}={summary['cells'][cell_name][headline_key]:.3f}",
               flush=True)
 
     import json
@@ -273,7 +482,20 @@ def run_experiment(
     return summary
 
 
-def _build_llm_agents(traders, llm_cfg: dict[str, Any], max_price: int):
+def _payout_phrase(dividend_values: Sequence[int]) -> str:
+    """(0, 8, 28, 60) -> '0, 8, 28, or 60' for the instruction templates."""
+    values = [str(v) for v in dividend_values]
+    return ", ".join(values[:-1]) + f", or {values[-1]}"
+
+
+def _build_llm_agents(
+    traders,
+    llm_cfg: dict[str, Any],
+    max_price: int,
+    *,
+    template_vars: dict[str, Any] | None = None,
+    experience_by_trader: dict[str, str] | None = None,
+):
     """One shared client + recorder per session; one LLMTrader per trader."""
     from agentic_trading.agents.llm import (
         AnthropicChatClient,
@@ -300,14 +522,24 @@ def _build_llm_agents(traders, llm_cfg: dict[str, Any], max_price: int):
         k_retries=llm_cfg.get("k_retries", 3),
         persona=llm_cfg.get("persona", "neutral"),
         memory=llm_cfg.get("memory", "none"),
+        template_vars=template_vars or {},
     )
-    agents = {t.trader_id: LLMTrader(t.trader_id, client, recorder, config) for t in traders}
+    agents = {
+        t.trader_id: LLMTrader(
+            t.trader_id,
+            client,
+            recorder,
+            config,
+            experience=(experience_by_trader or {}).get(t.trader_id),
+        )
+        for t in traders
+    }
     return agents, recorder
 
 
-def _attach_llm_capture(log, cell, agents, recorder) -> None:
+def _attach_llm_capture(log, cell, agents, recorder, *, coordination: bool = False) -> None:
     """Full-capture attachment + the invalid-by-construction completeness check."""
-    from agentic_trading.agents.llm import scan_recognition
+    from agentic_trading.agents.llm import scan_coordination, scan_recognition
 
     client = next(iter(agents.values())).client
     if len(recorder.records) != client.call_count:
@@ -326,8 +558,53 @@ def _attach_llm_capture(log, cell, agents, recorder) -> None:
         "persona": llm_cfg.get("persona", "neutral"),
         "memory": llm_cfg.get("memory", "none"),
     }
+    if cell.get("experience_from"):
+        log["meta"]["llm"]["experience_from"] = cell["experience_from"]
     log["meta"]["validity"] = recorder.validity_stats()
     log["meta"]["recognition_flags"] = scan_recognition(recorder.records)
+    if coordination:  # duopoly guardrail (A5.vii)
+        log["meta"]["coordination_flags"] = scan_coordination(recorder.records)
+
+
+def _build_llm_market_makers(mm_ids, llm_cfg: dict[str, Any], spec):
+    """Two dealers can share one client + recorder (one session, one log)."""
+    from agentic_trading.agents.llm import (
+        AnthropicChatClient,
+        LLMMarketMaker,
+        LLMTraderConfig,
+        OpenAICompatClient,
+        SessionRecorder,
+    )
+
+    provider = llm_cfg.get("provider", "openai_compat")
+    if provider == "anthropic":
+        client = AnthropicChatClient(llm_cfg["model"])
+    elif provider == "openai_compat":
+        client = OpenAICompatClient(llm_cfg["model"])
+    else:
+        raise ValueError(f"unknown provider: {provider!r}")
+    recorder = SessionRecorder()
+    config = LLMTraderConfig(
+        model=llm_cfg["model"],
+        template=llm_cfg["template"],
+        temperature=llm_cfg.get("temperature", 0.7),
+        max_tokens=llm_cfg.get("max_tokens", 80),
+        k_retries=llm_cfg.get("k_retries", 3),
+        persona=llm_cfg.get("persona", "neutral"),
+        template_vars={
+            "reference_value": spec.reference_value,
+            "max_half_spread": spec.max_half_spread,
+            "phi": f"{spec.inventory_phi:g}",
+            "n_rounds": spec.n_rounds,
+        },
+    )
+    agents = {
+        mm: LLMMarketMaker(
+            mm, client, recorder, config, max_half_spread=spec.max_half_spread
+        )
+        for mm in mm_ids
+    }
+    return agents, recorder
 
 
 def load_session_logs(path: Path | str) -> list[dict[str, Any]]:
@@ -501,4 +778,5 @@ if __name__ == "__main__":
         _canonical.load_config(args.config), args.results_root
     )
     for name, cell in result["cells"].items():
-        print(f"{name}: n={cell['n_sessions']} mean_efficiency={cell['mean_efficiency']:.3f}")
+        key = next(k for k in cell if k.startswith("mean_"))
+        print(f"{name}: n={cell['n_sessions']} {key}={cell[key]:.3f}")
