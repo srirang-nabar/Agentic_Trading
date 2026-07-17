@@ -1,4 +1,6 @@
-# Agentic Trading — experimental economics with LLM agents
+# Market Experiments with LLM Agents (Multi-Agent Systems, Experimental Economics)
+
+*a.k.a. Agentic Trading*
 
 Do markets of LLM traders converge, bubble, and collude? This project rebuilds the
 canonical human-subject market experiments — Smith's (1962) continuous double
