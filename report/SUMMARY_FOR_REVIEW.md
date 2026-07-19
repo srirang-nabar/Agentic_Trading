@@ -18,6 +18,8 @@ from committed session logs, so a reviewer can verify everything **without an AP
 
 **How to review quickly (~5 min):**
 
+**Fastest path: `notebooks/00_review_walkthrough.ipynb`** — a single commented, pre-executed notebook backing every resume point, with the asserts inline.
+
 1. Open `notebooks/03_smith_convergence.ipynb`, `04_ssw_bubbles.ipynb`, `05_duopoly_collusion.ipynb` —
    commented, pre-executed, each asserts its headline row against CLAIMS.md from committed logs.
 2. Optional: `uv sync --frozen && uv run pytest -q` (194 gate tests) — runs key-less; fresh-machine log
