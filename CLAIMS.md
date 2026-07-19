@@ -33,4 +33,5 @@ appear in the README.** Values must match the notebook assert values exactly.
 | H3-4 | H3 supported (supra-Nash markup AND collusion signature on probes) | no | 05_duopoly_collusion.ipynb, gate cell | test_gate_stage6.py::test_h3_analysis_matches_claims | duopoly_h3 |
 | H3-5 | Mean rival probe response, A / B (negative = matching = competition) | -1.53 / -1.99 | 05_duopoly_collusion.ipynb, gate cell | test_gate_stage6.py::test_h3_analysis_matches_claims | duopoly_h3 |
 | H3-6 | Mean markup, exploratory mixed cell (LLM vs myopic best-response) | +4.05 | 05_duopoly_collusion.ipynb, gate cell | test_gate_stage6.py::test_h3_analysis_matches_claims | duopoly_explore |
+| H3-7 | Observed-to-Nash spread ratio, A / B (Nash spread = 8.0 exact in all sessions) | 4.43× / 3.17× | 00_review_walkthrough.ipynb, duopoly cell | asserted in-notebook (nbconvert-executed) | duopoly_h3 |
 | HOLM-1 | Holm–Bonferroni family verdict across {H1, H2, H3} at α = 0.05 | 0/3 | 05_duopoly_collusion.ipynb, gate cell | test_gate_stage6.py::test_h3_analysis_matches_claims | smith_h1, ssw_h2, duopoly_h3 |

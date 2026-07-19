@@ -14,7 +14,7 @@ from committed session logs, so a reviewer can verify everything **without an AP
 | -------- | ------ |
 | Do LLM traders out-converge zero-intelligence? | **No — reversed.** The 8B LLM *loses* to ZI-C: efficiency 0.22 vs 0.92 in seed-matched markets, with 35–47% loss-making trades random-but-constrained agents cannot make |
 | Do LLM asset markets bubble? | **No — inverted.** Markets priced ~60% *below* fundamentals (RD −0.59 vs ZI-C's +0.82) under both instruction paraphrases; experience halves the mispricing |
-| Do competing LLM dealers collude? | **Supra-Nash without collusion.** Spreads sat +27 francs above the certified competitive benchmark, but deviation probes showed *matching* (competition signature), not punishment — passivity, not cartel |
+| Do competing LLM dealers collude? | **Supra-Nash without collusion.** Dealer pairs quoted 4.4× the certified competitive (Nash) spread — a +27-franc markup on a Nash spread of exactly 8 — but deviation probes showed *matching* (competition signature), not punishment — passivity, not cartel |
 
 **How to review quickly (~5 min):**
 
